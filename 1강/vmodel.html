@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vbind</title>
+    <script src="https://unpkg.com/vue@next"></script>
+</head>
+<body>
+    <div id="app">
+        <input type="text" v-bind:placeholder="message">
+        <button v-on:click="reverseMessage">click</button>
+        <input type="text" v-model="username">
+    </div>
+    <script>
+        const app = Vue.createApp({
+            data(){
+                return{
+                    message : "값을 입력해주세요!",
+                    username: "짐코딩",
+                };
+            },
+            methods: {
+                hello() {
+                    alert("hello~~");
+                },
+                reverseMessage(){
+                   this.message = this.message.split("").reverse().join("");
+                },
+            },
+        });
+        app.mount('#app');
+    </script>
+</body>
+</html>
