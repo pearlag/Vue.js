@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/vue@next"></script>
+</head>
+<body> 
+    <div id="app">
+        <input type="text" v-bind:placeholder="message" />
+        <!-- 
+            v-bind로 연결  :: 단방향 바인딩
+            v- :: 디렉티브
+        -->
+        <hr />
+        <button v-on:click="reverseMessage">click</button>
+        <hr />
+        {{userName}}
+        <input type="text" v-model:value="userName" />
+        <!-- 
+            v-model 연결  :: 양방향 바인딩
+        -->
+        <hr>
+        <p v-if="visiable">보이나요?</p>
+        <button type="button" v-on:click="visiable = true">visiable</button>
+        <!-- 
+            button을 클릭시 visiable에 true 할당됨. 
+        -->
+        <hr>
+        <ul>
+            <li v-for="item in items">{{ item }}</li>
+        </ul>
+        <!--
+            v-for로 반복문
+         -->
+    </div>
+    <script>
+        const app = Vue.createApp({
+            data(){
+                return{
+                    message: "값을 입력해주세요!",
+                    userName: "짐코딩",
+                    visiable: false,
+                    items : ['사과', '포도', '딸기']
+                };
+            },
+            methods: {
+                hello() {
+                    alert("hello");
+                },
+                reverseMessage() {
+                    this.message = this.message.split("").reverse().join("");
+                },
+            },
+        });
+        app.mount('#app')
+    </script>
+    
+</body>
+</html>
