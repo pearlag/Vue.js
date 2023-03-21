@@ -9,6 +9,10 @@
 그럴 때 쓰는게 v-html
 const rawHtml = ref('<strong>안냐세요</strong>'); 
 선언 및 리턴하고,
-
-
 <p v-html="rawHtml"></p> 써주면 됨
+신뢰할 수 있는 콘텐츠에서만 사용하기!!
+
+
+v-bind
+v-bind 생략하고 :(콜론)으로 사용 가능:: 단축속성
+다중 속성을 한꺼번에 바인딩 가능하다.
