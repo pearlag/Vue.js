@@ -33,8 +33,6 @@ export default {
 		const type = ref('A');
 		const ok = ref(true);
 		
-	
-
 		return {visible, type, ok}
 	}
 }
