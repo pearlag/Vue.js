@@ -14,7 +14,7 @@ UI 프레임워크
 # 컴포넌트 기초 - 등록 및 사용
 - 컴포넌트는 UI를 재사용하기 위해 정의한 것.
 - UI를 나눔으로써 클린 코드.
-- 네이밍은 파스칼 or 카멜케이스
+- 네이밍은 파스칼 or 케밥케이스
 
 - 컴포넌트 정의 -> 등록 -> 사용
 
@@ -44,3 +44,37 @@ UI 프레임워크
 - 싱글 인스턴스 컴포넌트 이름
   오직 하나의 인스턴스만 있음을 알도록 The 접두사로 시작한다.
   TheSidebar.vue, TheHeading.vue
+
+# SFC
+- template + script + style
+
+- template은 루트에서 한 블록만 있을 수 있다.
+- .vue 파일은 하나의 script 블럭만 포함 가능함.
+- .vue 파일은 하나의 script setup 블럭만 포함 가능함.
+  - 컴포넌트의 setup()함수로 사용된다.
+
+- script의 lang 속성으로 전처리기 언어 선언 가능.
+  - <script lang="ts"> // TypeScript 선언
+- lang 속성은 모든 블록에 적용 가능하다.
+- src 속성으로 파일을 가져올 수 있다.
+- css 기능
+  - scoped 속성이 있는 경우, 해당 css는 현재 컴포넌트의 요소에만 적용.
+    <style scoped>
+  - module 속성
+    css 클래스를 $style로 노출
+    <p class="card-text" :class="$style.red"></p>
+    <style module>
+    .red {
+      color: red;
+    }
+    </style>
+  - 값을 지정해서 이름 변경 가능.
+
+
+ - v-bind로 동적인 css 사용 가능.
+    <style>
+    .red {
+      color: v-bind(color);
+    }
+    </style>
+    color 변수 선언하고, value값 바꿔주면서 컨트롤.
