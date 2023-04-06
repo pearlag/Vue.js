@@ -1,58 +1,64 @@
 <template>
 	<div class="card">
-		<img src="..." class="card-img-top" alt="..." />
 		<div class="card-body">
-			<h5 class="card-title red">Card title</h5>
+			<!-- {{ $props }} -->
+			<!--type : news, notice -->
+			<span class="badge bg-secondary">{{ typeName }}</span>
+			<h5 class="card-title red mt-2">{{ title }}</h5>
 			<p class="card-text">
-				Some quick example text to build on the card title and make up the bulk
-				of the card's content.
+				{{ cont }}
 			</p>
-			<a href="#" class="btn btn-primary">Go somewhere</a>
+			<a href="#" class="btn" :class="isLikeClass" @click="toggleLike"
+				>좋아요</a
+			>
 		</div>
 	</div>
 </template>
 
 <script>
-import { ref, useCssModule } from 'vue';
+import { computed } from 'vue';
 export default {
-	setup() {
-		// const stule = useCssModule();
-		// console.log('style: ', style);
-
-		const color = ref('red');
-		color.value = 'yellow';
-
-		return { color };
+	props: {
+		type: {
+			type: String,
+			default: 'news', // 속성이 null or undefined일 때
+			validator: value => {
+				return ['news', 'notice'].includes(value);
+			},
+		},
+		title: {
+			type: String,
+			required: true, //필수
+		},
+		cont: {
+			type: String,
+			// required: true, //필수
+		},
+		isLike: {
+			type: Boolean,
+			default: false,
+		},
+		obj: {
+			type: Object,
+			default: () => ({}),
+		},
+	},
+	emits: ['toggleLike'],
+	setup(props, context) {
+		// console.log('props.title: ', props.title);
+		const isLikeClass = computed(() =>
+			props.isLike ? 'btn-danger' : 'btn-outline-danger',
+		);
+		const typeName = computed(() =>
+			props.type === 'news' ? '뉴스' : '공지사항',
+		);
+		const toggleLike = () => {
+			// props.isLike = !props.isLike;
+			context.emit('toggleLike');
+		};
+		return { isLikeClass, typeName, toggleLike };
 	},
 };
 </script>
 
-<style>
-.red {
-	color: v-bind(color);
-}
-</style>
-
-<!--
-<style scoped>
-.red {
-	color: red;
-}
-</style>
--->
-
-<!-- 
-<style module="classes">
-.red {
-	color: red;
-}
-</style>
--->
-
-<!--
-<style module>
-.red {
-	color: red;
-}
-</style>
--->
+<style></style>

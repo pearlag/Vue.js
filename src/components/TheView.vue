@@ -1,41 +1,26 @@
 <template>
-	<div>
-		<main>
-			<div class="container py-4">
-				<div class="row g-3">
-					<div class="col col-4">
-						<AppCard></AppCard>
-					</div>
-					<div class="col col-4">
-						<AppCard></AppCard>
-					</div>
-					<div class="col col-4">
-						<AppCard></AppCard>
-					</div>
-					<div class="col col-4">
-						<AppCard></AppCard>
-					</div>
-					<div class="col col-4">
-						<AppCard></AppCard>
-					</div>
-					<div class="col col-4">
-						<AppCard></AppCard>
-					</div>
-				</div>
-			</div>
-		</main>
-	</div>
+	<main>
+		<div class="container py-4">
+			<MyButton class="my-button" id="my-button" @click="sayHello"></MyButton>
+			<LabelInput label="이름" data-id="id입니다"></LabelInput>
+		</div>
+	</main>
 </template>
 
 <script>
-import AppCard from '@/components/AppCard.vue';
+import MyButton from '@/components/MyButton.vue';
+import LabelInput from '@/components/LabelInput.vue';
 export default {
 	components: {
-		AppCard,
+		MyButton,
+		LabelInput,
 	},
-
 	setup() {
-		return {};
+		const sayHello = () => {
+			alert('안녕하세요!');
+		};
+
+		return { sayHello };
 	},
 };
 </script>
