@@ -260,3 +260,37 @@ function()을
      자식 컴포넌트에서, 속성을 상속할 곳에 v-bind="$attrs" 로 명시적으로 표시해줘야 함.
 
      이벤트를 발생시킬 땐 emit 옵션에 반드시 선언해야, 상위 박스에 이벤트가 걸리지 않는다.
+
+# Slot
+컴포넌트에 콘텐츠를 전달할 수 있음.
+ - fallback content
+  부모 컨텐츠에서 슬롯 콘텐츠가 제공되지 않을 때, 슬롯에 대한 폴백(기본 콘텐츠) 제공.
+   --> <slot></slot> 태그 안에 기본으로 들어갈 콘텐츠를 넣어주면 된다.
+ - Named Slots(#으로 단축할수 있음.)
+    
+    특정 슬롯 콘텐츠가 렌더링 되어야 할 위치를 설정할 수 있다.
+    name이 없는 slot의 이름은 default이다.
+    <div class="card-footer">
+			<slot name="footer">#footer</slot>
+		</div>
+    <AppCard>
+      <template #header>제목입니다</template>
+      <!-- <template #default>내용입니다</template> -->
+      암시적으로 default 슬롯입니다.
+      <template #footer>푸터입니다</template>
+    </AppCard>
+
+  - 동적 변경 가능
+    1. 변수에 ref함수로 name값을 할당한 다음에
+        const slotArgs = ref('header');
+    2.  template 속성에 #[변수이름] 넣고 컨텐츠를 삽입한다.
+        <template #[slotArgs]>제목입니다</template>
+    3. vue devtools에서 변수의 name값을 변경하면 컨텐츠를 다른 슬롯으로 넣을 수 있다.
+  
+  - Render Scope
+  슬롯 컨텐츠에서 슬롯 컴포넌트의 데이터는 참조할 수 있으나, 자식 컴포넌트의 데이터는 참조할 수 없다. 그렇다면 그 방법은
+  - Scoped Slots 이다.
+   props를 전달하는 것처럼 속성을 전달한다.
+
+
+
