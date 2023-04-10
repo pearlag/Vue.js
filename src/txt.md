@@ -293,4 +293,130 @@ function()을
    props를 전달하는 것처럼 속성을 전달한다.
 
 
+# Provide / Inject
+ - Prop Drilling의 문제를 해결할 수 있다.
+ 부모 컴포넌트는 계층 구조의 깊이에 관련없이, 원하는 자식 컴포넌트에 데이터를 전달할 수 있다.
+ 1. provider 역할을 하는 상위 컴포넌트 setup()함수 내부에 선언.
+ provide(주입할 키, 제공하는 값)
+ 2. 가져올 자식 컴포넌트에서 setup()함수 내부에 inject 선언
+ const 제공하는값 = inject(주입키, 디폴트값)
+- Provide / Inject를 반응성 데이터로 제공할 때, 가능한 모든 변경을  Provider 내부에서 하는 것이 좋다.
 
+# Symbol
+ - 충돌 피하기
+
+# App-Level Provide
+- App은 루트 컴포넌트이다. 여기서 데이터를 제공(Provide)하게 되면 모든 컴포넌트에서 사용(Inject)할 수 있다.
+
+# this
+- globalProperties :: 모든 컴포넌트에서 접근하고싶은 라이브러리와 같은 객체 추가.
+  main.js 에서 추가 - > 컴포넌트 인스턴스에서 mounted함수에 this 불러오기.
+- mounted 라이프사이클 훅은 컴포넌트 인스턴스가 생성된 후이기 때문에 this로 접근이 가능하다. but Vue3의 컴포지션 API의 setup함수에서는 컴포넌트 인스턴스가 생성되기 전이라서 this로 접근할 수 없다.
+--->  이럴 때 provide와 inject 활용이 가능하다.
+
+
+# 라이프사이클 훅 
+- 단계별 기능, 함수를 말한다.
+
+Creation(컴포넌트 인스턴스 생성)
+컴포넌트 초기화 단계이며, 가장 먼저 실행된다.
+컴포넌트가 DOM에 추가되기 전이므로, DOM에 접근할 수 없다.
+
+
+  - setup
+    가장 먼저 실행됨
+
+  - beforeCreate
+    2번째로 실행됨
+    컴포넌트가 초기화될 때 실행되는 훅이다. 인스턴스(this)접근 가능.
+
+  - created 
+    3번째로 실행됨
+
+
+
+Mounting(장착)
+DOM에 컴포넌트를 삽입하는 단계.
+
+  - OnBeforeMount
+    컴포넌트가 마운트되기 직전에 호출
+
+  - OnMounted
+    컴포넌트가 마운트된 후에 호출됨. (모든 자식 컴포넌트가 마운트 되었다는 뜻)
+    DOM에 접근할 수 있다.
+    
+
+Updating(변경)
+컴포넌트에서 사용되는 반응형 데이터가 변경되거나, 재렌더링 발생될 때 호출.
+디버깅할때 씀.
+
+  - OnBeforUpdate
+    반응형 상태 변경으로 인해 컴포넌트가 DOM 트리를 업데이트하기 직전에 호출됨.
+
+  - OnUpdated
+    DoM 트리를 업데이트 한 후에 호출됨.
+
+Destruction(소멸)
+  - OnBeforeUnmount
+    마운트가 해제되기 직전에 호출
+
+  - OnUnmounted
+    마운트가 해제된 후 호출됨. (DOM을 못 가져온다.)
+
+- Options API, Composition API에서도 지원된다.
+
+# Template refs
+기본 DOM 요소에 직접 접근할 때.
+'ref'
+
+- v-for 내부 참조
+  여러개의 돔 요소를 직접 참조한다.
+
+  문자열  키를 할당할 수도, 
+  <li v-for="fruit in fruits" :key="fruit" ref="itemRefs">{{ fruit }}</li>
+  itemRefs.value.forEach(item => console.log('item: ', item.textContent));
+
+  함수로 넣을 수도 있다.
+  <li
+    v-for="fruit in fruits"
+    :key="fruit"
+    :ref="el => itemRefs.push(el.textContent)"
+  >
+    {{ fruit }}
+  </li>
+  itemRefs.value.forEach(item => console.log('item: ', item));
+
+
+- 컴포넌트 Refs
+but 일반적으로 props나 emit을 사용해야 한다.
+
+- 자식 -> 부모 접근 $parents
+
+
+# script setup
+
+<script setup>
+
+</script>
+
+이 안에 쓰면. setup함수 안에 컴파일이 된다.
+선언과 리턴을 축약해준다. 편리하다.
+
+ - 여기선 props와 emits을 어떻게 선언할까?
+defineProps()
+defineEmits()
+import 필요없음.
+
+ - 기본적으로 컴포넌트간 통신이 닫혀 있음.
+ 내부의 데이터를 명시적으로 노출하려면 defineExpose() 메서드를 사용해야 함.
+
+- 일반 <script> 함께 사용 가능.
+  한 번만 호출하고싶은 함수가 있을 때 nomal script block과 함께 사용한다. 
+
+
+- top level에서 await 사용 가능.
+원래 async와 함께 사용해야하는데 script setup이라 가능
+
+ npm i axios
+ dummy sample rest api
+ eslint vue plugin
