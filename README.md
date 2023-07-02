@@ -369,13 +369,13 @@ rules: {
 ### rules 셋팅을 자동으로 파일에 수정저장 하는법
 1. 설정 - 작업 영역 - eslint - Eslint: Validate
 2. settings.json
-```js
+```js,
 {
   "eslint.validate": [
       "javascript",
       "javascriptreact",
       "typescript",
-      "typescriptreact",
+      "typescriptreact",,,,
       // "html",  // 삭제
       "vue",
       "markdown"

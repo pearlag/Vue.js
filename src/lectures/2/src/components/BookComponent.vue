@@ -1,12 +1,10 @@
 <template>
-  <article class="book">
-      <div class="book_subtitle">제목</div>
-      <div class="book_title">title</div>
-  </article>
+	<article class="book">
+		<div class="book_subtitle">제목</div>
+		<div class="book_title">title</div>
+	</article>
 </template>
 <script>
-export default {
-}
+export default {};
 </script>
-<style>
-</style>
+<style></style>

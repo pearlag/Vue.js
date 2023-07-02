@@ -1,17 +1,15 @@
 <template>
-  <nav>
-    <ul>
-      <li><a href="#none">메뉴1</a></li>
-      <li><a href="#none">메뉴2</a></li>
-      <li><a href="#none">메뉴3</a></li>
-      <li><a href="#none">메뉴4</a></li>
-      <li><a href="#none">메뉴5</a></li>
-    </ul>
-  </nav>
+	<nav>
+		<ul>
+			<li><a href="#none">메뉴1</a></li>
+			<li><a href="#none">메뉴2</a></li>
+			<li><a href="#none">메뉴3</a></li>
+			<li><a href="#none">메뉴4</a></li>
+			<li><a href="#none">메뉴5</a></li>
+		</ul>
+	</nav>
 </template>
 <script>
-export default {
-}
+export default {};
 </script>
-<style>
-</style>
+<style></style>

@@ -1,16 +1,14 @@
 <template>
-    <main>
-      <section>
-        <book-component></book-component>
-        <book-component></book-component>
-        <book-component></book-component>
-        <book-component></book-component>
-        </section>
-    </main>
+	<main>
+		<section>
+			<book-component></book-component>
+			<book-component></book-component>
+			<book-component></book-component>
+			<book-component></book-component>
+		</section>
+	</main>
 </template>
 <script>
-export default {
-}
+export default {};
 </script>
-<style>
-</style>
+<style></style>
