@@ -860,10 +860,10 @@ export default {
 #### <code>v-html</code> <br />  
 > 실제 HTML을 출력하려면 <code>v-html</code> 디렉티브를 사용한다.   
 > XSS 취약점으로 이어질 수 있어, 신뢰할 수 있는 콘텐츠에서만 사용한다.   
-<code>
+```html
 <p v-html="rawHtml"></p>
-</code>
 
+``` 
 #### <code>v-bind</code> 속성 바인딩
 v-bind / :
 ```vue
@@ -916,7 +916,9 @@ export default {
 
 <br />
 자바스크립트 표현식을 출력할 수도 있다.
+
 ```vue
+
 <template>
  {{ message.split('').reverse().join('') }}<!-- !요세하녕안 --> <br />
   {{ isInputDisabled ? '예' : '아니오' }}<!-- 예 -->
@@ -924,3 +926,127 @@ export default {
 
 ```
  
+
+
+### 반응형 상태 선언하기
+> reactive()는 객체나 배열과 같은 레퍼런스타입. 즉 객체타입만 반응형 객체로 만들 수 있다. 
+```vue
+const state = reactive({
+  count: 0,
+  deep: {
+    count: 0,
+  },
+});
+
+<p>{{ message }}</p>
+let message = reactive('hello vue');
+<!-- 
+이렇게 선언해야 작동됨.
+-->
+<p>{{ message.value }}</p>
+
+let message = reactive({
+			value: 'hello vue',
+		});
+```  
+#### ref()로 원시값 반응형 데이터 생성하기
+> ref()는 기본타입(number, string, boolean)을 반응형으로 만들 수 있다.
+```vue
+import { ref } from 'vue'
+const count = ref()
+```
+
+#### 반응형 객체의 ref() unwrapping
+> ref()로 선언한 데이터를 반응형 객체의 속성으로 주입하게 되면, 자동으로 unwrapping된다.
+> 그럼에도 반응형은 연결되어 있다.
+
+```vue
+
+const count = ref(0);
+const state = reactive({
+  count,
+});
+console.log(count.value); // 1
+console.log(state.count); // 1 
+// state.count.value라고 적지 않아도 된다.
+
+```
+
+
+#### ref()가 반응형 배열 또는 Map과 같은 기본 컬렉션 타입의 요소로 접근될 때, wrapping 유지.
+```vue
+
+const message = ref('Hello');
+const arr = reactive([message]);
+console.log(arr[0].value);
+
+```
+
+#### 반응형 상태 구조 분해하기
+>  큰 반응형 객체의 몇몇  속성을 사용할 때, ES6 구조분해할당을 이용한다.   
+>  반응형 객체에서 구조분해 할당을 하게 되면 반응형 속성을 잃는다.   
+> 아래 예시에서 검사창을 확인하면 반응형 속성이 동작하지 않는다.  
+> typeof 검사를 해보면 string으로 나온다.
+```vue
+<template>
+	<div>
+		<p>author : {{ author }}</p>
+		<p>title : {{ title }}</p>
+	</div>
+</template>
+
+<script>
+import { reactive } from 'vue';
+export default {
+	setup() {
+		const book = reactive({
+			author: '주으니',
+			year: '2020',
+			title: 'Vue 3 Guide',
+			description: '당신은 지금..',
+			price: '18,000원',
+		});
+
+		const { author, title } = book;
+
+		return {
+			author,
+			title,
+			book,
+		};
+	},
+};
+</script>
+
+```
+
+##### 반응성을 잃지 않으면서 구조분해할당을 하려면?
+###### <code>toRefs()</code>
+> 구조분해할당 여러개 할 때 사용.   
+> 원래 있던 객체의 속성과, 구조분해해서 재할당한 반응형 상태는 서로 동기화된다.   
+
+```vue
+
+		const { author, title } = toRefs(book);
+
+```
+
+
+###### <code>toRef()</code>
+> 구조분해할당 한 개씩만 가져올 때 사용.   
+> 두 번째 파라미터로 가져오고 싶은 속성을 넣으면 된다.   
+```vue
+
+		const author = toRef(book, 'author');
+		const title = toRef(book, 'title');
+
+```
+
+
+#### <code>readonly</code>
+반응형 객체의 변경을 방지한다.
+
+```vue
+const copy = readonly(original);
+
+```
