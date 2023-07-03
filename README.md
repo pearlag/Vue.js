@@ -709,4 +709,218 @@ export default {
 > > <b>재사용(Composable) 유용</b>. Options API의 Mixin 사용 안해도 됨.     
 > 옵션을 선언하는 대신에 가져온 함수(ref, onMouted ,,)를 사용하여 Vue 컴포넌트를 작성할 수 있는 API 세트이다.   
 > <a href="vuejs.org/api" target="_blank">api 공식문서</a>   
-> 
+
+### 반응형 API (Reactivity API)
+반응하는 데이터와 관련된 API 세트.
+* <code>ref()</code>
+* <code>isRef()</code> 반응형 데이터인지 검사하는 api.
+* 아래 예시는 ref()를 활용하여 btn 클릭시 '!'를 추가하는 로직이다.
+* 반응형 데이터와 일반 데이터의 로직을 비교해보길.
+```vue
+<template>
+	<div>
+		<h2>반응형 메시지</h2>
+		<p>{{ reactiveMessage }}</p>
+		<button v-on:click="addReactiveMessage">Add Message</button>
+		<h2>일반 메시지</h2>
+		<p>{{ normalMessage }}</p>
+		<button v-on:click="addNormalMessage">Add Message</button>
+	</div>
+</template>
+
+<script>
+import { ref, isRef } from 'vue';
+export default {
+	setup() {
+		const reactiveMessage = ref('Hello Reactive Message');
+		const addReactiveMessage = () => {
+			reactiveMessage.value = reactiveMessage.value + '!';
+		};
+		//반응형 데이터 유무 검사
+		console.log('isRef(reactiveMessage):', isRef(reactiveMessage));
+		// true
+
+		let normalMessage = 'Hello Normal Message';
+		const addNormalMessage = () => {
+			normalMessage = normalMessage + '!';
+		};
+		//반응형 데이터 유무 검사
+		console.log('isRef(normalMessage):', isRef(normalMessage));
+		// false
+
+		return {
+			reactiveMessage,
+			normalMessage,
+			addReactiveMessage,
+			addNormalMessage,
+		};
+	},
+};
+</script>
+```
+
+### 라이프 사이클 훅(Lifecycle Hooks)
+#### 라이프 사이클
+Vue 인스턴스나 컴포넌트가 생성될 때 거치는 과정.
+#### 라이프 사이클 훅
+라이프사이클 단계에서 실행되는 함수.
+
+### setup()
+컴포넌트가 생성되기 이전에 실행되는 Hook.
+#### 사용법
+1. 반응형 상태를 선언한다.
+
+```vue
+import { ref } from 'vue'
+export default{
+  setup(){
+    const count = ref(0)
+    
+    return{
+      count
+    }
+  }
+}
+```
+2. 템플릿에서 쓴다.
+```vue
+<template>
+  <button @click="count++">{{ count }}</button>
+</template>
+```
+2. 컴포넌트 인스턴스에서 사용한다. <br />
+<code>this</code> 키워드로 접근 가능하다.
+```vue
+...
+  setup(){
+    ...
+  },
+  mounted(){
+    console.log(this.count)
+  }
+...
+```
+
+#### Props 접근
+> setup()의 첫 번째 매개변수이다.   
+> 반응형 객체이다.   
+```vue
+export default{
+  props:{
+    title: String
+  },
+  setup(props){
+    console.log(props.title)
+  }
+}
+```
+
+#### Setup Context
+> setup(props, context)   
+> > context.attrs   
+> > context.slot   
+> > context.emit   
+> > context.expose
+또는 <code>setup(props, {attrs, slots, emit, expose})</code>
+
+
+### 종속성 주입(Dependency Infection)
+
+### 템플릿 문법
+이중 중괄호를 사용해 데이터에 바인딩할 수 있다.   
+
+#### <code>v-once</code> 데이터가 변경되어도 갱신하지 않는 일회성 보간.
+```vue
+<p v-once>문자열: {{ message }}</p>
+```
+```vue
+<template>
+	<div>
+		<h2>보간법</h2>
+		<p>{{ message }}</p>
+		<p v-once>{{ message }}</p>
+		<button @click="message = message + '!'">click!</button>
+	</div>
+</template>
+
+<script>
+import { ref } from 'vue';
+export default {
+	setup() {
+		const message = ref('안녕하세요!');
+		return {
+			message,
+		};
+	},
+};
+</script>
+
+```
+
+#### <code>v-html</code> <br />  
+> 실제 HTML을 출력하려면 <code>v-html</code> 디렉티브를 사용한다.   
+> XSS 취약점으로 이어질 수 있어, 신뢰할 수 있는 콘텐츠에서만 사용한다.   
+<code>
+<p v-html="rawHtml"></p>
+</code>
+
+#### <code>v-bind</code> 속성 바인딩
+v-bind / :
+```vue
+<template>
+  <div v-bind:title="dynamicTitle">마우스를 올려보세요</div>
+
+  <!-- 단축 속성 -->
+  <div :title="dynamicTitle">마우스를 올려보세요</div>
+</template>
+
+<script>
+import { ref } from 'vue';
+export default {
+  setup() {
+    const dynamicTitle = ref('안녕하세요~~');
+    return {
+			dynamicTitle,
+		};
+  },
+};
+</script>
+```
+<br />
+
+여러 개의 속성을 한꺼번에 바인딩할 수 있다.  
+```vue
+<template>
+  <input v-bind="attrs" />
+
+  <!-- 단축 속성 -->
+  <input :="attrs" /> 
+</template>
+
+<script>
+import { ref } from 'vue';
+export default {
+  setup() {
+    const attrs = ref({
+			type: 'password',
+			value: '12345',
+			disabled: false,
+		});
+    return {
+			attrs,
+		};
+  },
+};
+</script>
+```
+
+<br />
+자바스크립트 표현식을 출력할 수도 있다.
+```vue
+<template>
+ {{ message.split('').reverse().join('') }}<!-- !요세하녕안 --> <br />
+  {{ isInputDisabled ? '예' : '아니오' }}<!-- 예 -->
+</template>
+
+```
+ 
