@@ -122,7 +122,7 @@ const student4 = new Student("나연", 11, 50, 75);
 
 const students = [student1, student2, student3, student4];
 
-cosnt result = numbers.map((number) => number * 2);
+const result = numbers.map((number) => number * 2);
 console.log(
 "영어 점수"
 students.map((student) => student.en)
@@ -1050,3 +1050,63 @@ export default {
 const copy = readonly(original);
 
 ```
+
+### <code>computed</code>
+계산된 결과를 보여준다. 템플릿에 적으면 코드가 복잡하니 setup()안에 computed() 정의하여 코드를 깔끔하게 한다.
+> '캐시된다.' 계산된 결과를 보관하고 있다가 다음에 또 요청될때 캐시된 데이터를 돌려준다. (일반 메서드는 실행될 때마다 몇 번이고 계산된다.)   
+> 반응형 데이터가 변경될 때, 캐시가 다시 계산된다.   
+> 기본적으로 getter(읽기)전용이다. 새 값을 할당하려 하면 오류 표시된다.     
+> > 쓰기가 필요하다면 getter(보내고), setter(받고) 함수를 적용시킨다.   
+```vue
+<script>
+import { reactive, computed, ref } from 'vue';
+export default {
+	setup() {
+		const teacher = reactive({
+			name: '진주은',
+			lectures: ['HTML/CSS', 'Javascript', 'Vue3'],
+		});
+
+		const hasLectures = computed(() => {
+			console.log('computed');
+			return teacher.lectures.length > 0 ? '있음' : '없음';
+		});
+
+		const existLectures = () => {
+			console.log('method');
+			return teacher.lectures.length > 0 ? '있음' : '없음';
+		};
+
+		const count = ref(0);
+
+		const firstName = ref('홍');
+		const lastName = ref('길동');
+		const fullName = computed({
+			get() {
+				// 원래 값 보내기
+				return firstName.value + ' ' + lastName.value;
+			},
+			set(value) {
+				//쓰기 가능한 속성으로 만듬
+				[firstName.value, lastName.value] = value.split(' ');
+			},
+		});
+		console.log('Console 출력:', fullName.value);
+		fullName.value = '짐 코딩';
+		return {
+			teacher,
+			hasLectures,
+			existLectures,
+			count,
+			fullName,
+		};
+	},
+};
+</script>
+
+```
+
+
+# HTML 클래스 바인딩
+## <code>v-bind / :</code>
+> 일반 클래스와 바인드된 클래스와 공존할수 있다.
