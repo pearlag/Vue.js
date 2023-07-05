@@ -671,7 +671,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>
 ```
 > data, methods, mounted 옵션에 따라 나눠놓음.
 > 논리적 관심사를 처리하는 코드가 분산되어 있어 분석이 어렵다.
@@ -701,7 +701,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>
 
 ```
 > setup 함수 안에 논리적 관심사대로 그룹핑해놓음. 분석이 쉽다.   
@@ -1109,4 +1109,110 @@ export default {
 
 # HTML 클래스 바인딩
 ## <code>v-bind / :</code>
-> 일반 클래스와 바인드된 클래스와 공존할수 있다.
+> 일반 클래스와 바인드된 클래스는 공존할수 있다.   
+> 여러 class를 넣으려면 콤마(,)로 구분한다.   
+```vue
+
+<div :class="{ active: isActive, 'text-danger': hasError }">text</div>
+
+```
+> 바인딩할 데이터가 많다면 오브젝트로 사용 가능하다.   
+```vue
+<div :class="classObject">text</div>
+
+const classObject = reactive({
+  active: true,
+  'text-danger': false,
+ });
+```
+
+> 배열로도 넣을 수 있다.   
+```vue
+
+<div :class="[activeClass, errorClass]">text</div>
+
+```
+
+## inline Style 
+```vue
+<div :style="styleObject">
+
+...
+
+const styleObject = reactive({
+  color: 'red',
+  fontSize: '13px',
+});
+
+```
+> 속성명을 camelCase로 넣는다.   
+
+
+### 동적으로 style 바인딩하기
+```vue
+
+<template>
+	<div>
+		<div :style="styleObject">
+			Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos nam
+			voluptatibus, aut unde odit accusantium consequatur voluptatum earum ullam
+			a est dolores perspiciatis quaerat libero odio exercitationem sapiente
+			voluptate. Vero!
+		</div>
+		<button @click="fontSize--">-</button>
+		<button @click="fontSize++">+</button>
+	</div>
+</template>
+
+<script>
+import { computed, reactive, ref } from 'vue';
+export default {
+	setup() {
+		// const styleObject = reactive({
+		// 	color: 'red',
+		// 	fontSize: '13px',
+		// });
+
+		const fontSize = ref(13);
+
+		const styleObject = computed(() => {
+			return {
+				color: 'red',
+				fontSize: fontSize.value + 'px',
+			};
+		});
+		return { styleObject, fontSize };
+	},
+};
+</script>
+
+```
+
+# 조건부 렌더링
+
+## <code>v-if</code>
+> js 문법과 흡사하다. 참: 보임 / 거짓: 안보임   
+> false일 때 렌더링조차 안 된다.
+> <code>v-for</code>와 동시 사용 피하기.
+
+## <code>v-else</code>
+> if, else
+
+## <code>v-else-if</code>
+> if, else if, else
+
+## <code><template v-if=""></code> 여러 개의 HTML요소를 v-if 디렉티브로 연결하기
+> 하나의 조건으로 여러 노드 컨트롤
+
+## <code>v-show</code>
+> 노드는 그대로 있고, style의 display 여부로 표시 여부를 결정한다.   
+
+## <code>v-if</code> vs <code>v-show</code>
+> v-if   
+> > 실제로 렌더링된다. 전환 비용이 높다.   
+> > 초기 렌더링 시, false이면 아무 작업도 하지 않는다.   
+> > 자주 전환하는 노드일 때 사용하기.
+> v-show   
+> > 일단 엘리먼트를 생성한다. 초기 비용이 높다.   
+> > 조건에 따라 display block/none으로 속성을 전환한다.
+> > 런타임 시 조건이 변경되지 않을 때 사용하기.
