@@ -1218,3 +1218,106 @@ export default {
 > 일단 엘리먼트를 생성한다. 초기 비용이 높다.   
 > 조건에 따라 display block/none으로 속성을 전환한다.   
 > 런타임 시 조건이 변경되지 않을 때 사용하기.
+
+#### 예제
+```vue
+
+<template>
+	<div>
+		<h2 v-if="visible">Hello Vue3</h2>
+		<h2 v-else>this is false.</h2>
+		<button @click="visible = !visible">toggle</button>
+
+		<hr />
+
+		<button @click="type = 'A'">A</button>
+		<button @click="type = 'B'">B</button>
+		<button @click="type = 'C'">C</button>
+		<button @click="type = 'D'">D</button>
+
+		<h2 v-if="type === 'A'">A입니다.</h2>
+		<h2 v-else-if="type === 'B'">B입니다.</h2>
+		<h2 v-else-if="type === 'C'">C입니다.</h2>
+		<h2 v-else>A, B, C가 아닙니다.</h2>
+
+		<hr />
+		<template v-if="visible">
+			<h1>title</h1>
+			<p>hi, hello</p>
+			<p>hi, hello</p>
+		</template>
+		<hr />
+
+		<h1 v-show="on">title 입니다.</h1>
+		<button @click="on = !on">Show title</button>
+	</div>
+</template>
+
+<script>
+import { ref } from 'vue';
+export default {
+	setup() {
+		const visible = ref(false);
+		const type = ref('A');
+		const on = ref(true);
+		return { visible, type, on };
+	},
+};
+</script>
+
+<style scoped></style>
+
+
+```
+
+# 목록 렌더링
+
+### ```v-for```
+> 배열인 목록을 렌더링할 수 있다.
+> ```v-for="item in items"``` 배열에서 항목을 순차적으로 할당한다.
+> ```v-for="(item, index) in items" :key="item.id"```
+> > 배열 인덱스 가져오기
+> > ```:key``` 속성에 고유한 값 지정해야 함.
+### 예제
+```vue
+<template>
+	<div>
+		<ul>
+			<template v-for="(item, index) in evenItems" :key="item.id">
+				<!-- <li v-if="item.id % 2 === 0"> -->
+				<li>ID : {{ item.id }}, 인덱스: {{ index }}, {{ item.message }}</li>
+			</template>
+		</ul>
+
+		<hr />
+
+		<ul>
+			<li v-for="(value, key, index) in myObject" :key="key">
+				{{ index }}-{{ key }}-{{ value }}
+			</li>
+		</ul>
+	</div>
+</template>
+<script>
+import { computed, reactive } from 'vue';
+export default {
+	setup() {
+		const items = reactive([
+			{ id: 1, message: 'Java' },
+			{ id: 2, message: 'HTML' },
+			{ id: 3, message: 'css' },
+			{ id: 4, message: 'JavaScript' },
+		]);
+
+		const evenItems = computed(() => items.filter(item => item.id % 2 === 0));
+
+		const myObject = reactive({
+			title: '제목',
+			author: '홍길동',
+			pub: '2022-03-22',
+		});
+		return { items, evenItems, myObject };
+	},
+};
+</script>
+```
