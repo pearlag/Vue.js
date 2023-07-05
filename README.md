@@ -1190,29 +1190,31 @@ export default {
 
 # 조건부 렌더링
 
-## <code>v-if</code>
+### <code>v-if</code>
 > js 문법과 흡사하다. 참: 보임 / 거짓: 안보임   
 > false일 때 렌더링조차 안 된다.
 > <code>v-for</code>와 동시 사용 피하기.
 
-## <code>v-else</code>
+### <code>v-else</code>
 > if, else
 
-## <code>v-else-if</code>
+### <code>v-else-if</code>
 > if, else if, else
 
-## <code><template v-if=""></code> 여러 개의 HTML요소를 v-if 디렉티브로 연결하기
+### <code><template v-if=""></code> 여러 개의 HTML요소를 v-if 디렉티브로 연결하기
 > 하나의 조건으로 여러 노드 컨트롤
 
-## <code>v-show</code>
+### <code>v-show</code>
 > 노드는 그대로 있고, style의 display 여부로 표시 여부를 결정한다.   
 
-## <code>v-if</code> vs <code>v-show</code>
-> v-if   
+### <code>v-if</code> vs <code>v-show</code>
+
+#### <code>v-if</code>   
 > > 실제로 렌더링된다. 전환 비용이 높다.   
 > > 초기 렌더링 시, false이면 아무 작업도 하지 않는다.   
 > > 자주 전환하는 노드일 때 사용하기.
-> v-show   
+
+#### <code>v-show</code>  
 > > 일단 엘리먼트를 생성한다. 초기 비용이 높다.   
 > > 조건에 따라 display block/none으로 속성을 전환한다.
 > > 런타임 시 조건이 변경되지 않을 때 사용하기.
