@@ -169,10 +169,10 @@ numbers.filter((number) => number % 2 === 0)
 * ES Modul   
 
 #### ES Module 방식(scss 파일 나누는거랑 똑같음) 
-1. package.json에서 <code>"type" : "module"</code> 선언
-2. script 태그에 <code>type="module"</code> 속성을 추가하면, 이 파일은 모듈로서 동작한다.
-3. 외부에서 불러올 때는 import를 사용한다. <code>@import{ 함수명, 함수명, 함수명 } from './math.js';</code>
-4. js파일에서 <code>export default 함수명;</code> 선언하면 부모 js 디렉티브에서 바로 받아올 수 있다. <code>import 함수명 from './math.js'</code>
+1. package.json에서 ```"type" : "module"``` 선언
+2. script 태그에 ```type="module"``` 속성을 추가하면, 이 파일은 모듈로서 동작한다.
+3. 외부에서 불러올 때는 import를 사용한다. ```@import{ 함수명, 함수명, 함수명 } from './math.js';```
+4. js파일에서 ```export default 함수명;``` 선언하면 부모 js 디렉티브에서 바로 받아올 수 있다. ```import 함수명 from './math.js'```
 5. 모아서 default 선언할수도 있다.
 ```js:
 // math.js
@@ -202,26 +202,26 @@ comsole.log(math.subtract);
 > devDependencies : 개발할 때 필요한 라이브러리    
 > dependencies : 운영할 때 필요한 라이브러리   
 #### 명령어
-> 기본값 입력 <code>npm init -y</code>    
-> 특정 버전 설치는 @+버전<code>npm i ajs@1.10.7</code>   
-> devDependencies에만 다운로드 <code>npm i --save-dev</code>   
-> 전역 설치 <code>-g</code>
+> 기본값 입력 ```npm init -y```    
+> 특정 버전 설치는 @+버전```npm i ajs@1.10.7```   
+> devDependencies에만 다운로드 ```npm i --save-dev```   
+> 전역 설치 ```-g```
 
 #### WebPack 기초 
 > 모듈 증가 -> 로딩 시간 증가   
 > 시간 줄이는 방법 : http 갯수를 줄인다.   
 > 배포하기 전, 여러 개의 파일을 하나의 파일로 줄인다.(번들링) / 모듈 번들러로 작업한다. (웹팩)   
-> 웹팩 설치 <code>npm i --save-dev webpack webpack-cli</code>   
-> <code>npx webpack --entry ./index.js</code>index.js를 기준으로 번들링하겠다.    
-> <code>--output-path ./dist</code>dist 폴더 안에 번들링 결과 파일을 저장함. 압축되어 생성하겠다.   
-> <code>--mode development</code>압축 없이 생성하겠다.   
+> 웹팩 설치 ```npm i --save-dev webpack webpack-cli```   
+> ```npx webpack --entry ./index.js```index.js를 기준으로 번들링하겠다.    
+> ```--output-path ./dist```dist 폴더 안에 번들링 결과 파일을 저장함. 압축되어 생성하겠다.   
+> ```--mode development```압축 없이 생성하겠다.   
 > <a href="webpack.js.org/guides/asset-management" target="_blank">셋팅 참고</a>   
 
 #### webpack.config.js 파일 설정
-> <code>npx webpack</code>명령어 입력시 webpack.config.js를 참고하여 번들링한다.   
+> ```npx webpack```명령어 입력시 webpack.config.js를 참고하여 번들링한다.   
 > packages.json - script에   
-> > <code>"build" : "webpack"</code> 셋팅 추가.   
-> > 터미널에 <code>npm run build</code> 하면 webpack 실행.   
+> > ```"build" : "webpack"``` 셋팅 추가.   
+> > 터미널에 ```npm run build``` 하면 webpack 실행.   
 > > js 뿐만 아니라 image, css도 번들링한다.   
 ```js
 // webpack.config.js
@@ -281,7 +281,7 @@ vue에 특화된 UI 프레임워크
 > npm i vue vite @vitejs/plugin-vue  
 
 ### vite.config.js 셋팅
-> 루트에 <code>vite.config.js</code> 생성   
+> 루트에 ```vite.config.js``` 생성   
 > <a href="https://github.com/vitejs/vite-plugin-vue/tree/main/packages/plugin-vue">vite 공식문서</a>참고하여 내용 복붙   
 ### package.json 셋팅
 > script에 "dev" : "vite"추가.   
@@ -305,7 +305,7 @@ app.mount('#app');
 
 ```
 ### style 분리 및 App.vue 셋팅
-> html에 있던 css를 <code>asset/base.css</code>로 분리.   
+> html에 있던 css를 ```asset/base.css```로 분리.   
 > 컴포넌트의 제일 상위에 있는 App.vue의 style블럭에 import해오기.  
 ```vue
 <style>
@@ -331,9 +331,9 @@ alias: 단축 url 지정.
 > src/App.vue: 루트 컴포넌트.   
 > > index.html 렌더링    
 > > -> main.js 렌더링 
-> > <code>import { createApp } from 'vue' </code>  
-> > <code>import App from './App.vue'</code>   
-> > <code>createApp(App).mount('#app')</code>   
+> > ```import { createApp } from 'vue' ```  
+> > ```import App from './App.vue'```   
+> > ```createApp(App).mount('#app')```   
 > > createApp는 뷰 인스턴스를 생성하는 메서드.    
 > > 루트 컴포넌트인 APP가 메서드 안에 들어감.   
 > > 생성된 뷰 인스턴스는 #app에 마운트됨.   
@@ -465,7 +465,7 @@ app.mount('#app');
 > 컴포넌트 : ui를 재사용할 수 있도록 정의하다    
 > 반복되는 코드를 <b>컴포넌트</b>로 만들면 편리하다.
 > 실무에선 주로  SFC를 사용한다.   
-> 네이밍은 <code>PascalCase</code> or <code>kebab-case</code>
+> 네이밍은 ```PascalCase``` or ```kebab-case```
 
 ## 컴포넌트 만들기
 > 컴포넌트 정의 -> 컴포넌트 등록(지역/전역) -> 컴포넌트 사용
@@ -514,7 +514,7 @@ app.mount('#app');
 * ui를 컴포넌트화 한다.   
 * App에 템플릿을 다 정의해서 담아준다.   
 * 하단 루트 컴포넌트 생성 옵션에 App을 담아준다.   
-* html에 <code><div id="app"></div></code> 만 정의해도 ui가 다 나온다.   
+* html에 ```<div id="app"></div>``` 만 정의해도 ui가 다 나온다.   
 ```html
 <style>
 *{margin:0;padding:0;}
@@ -589,9 +589,9 @@ app.mount('#app');
 </html>
 ```   
 5. 컴포넌트를 파일로 나누기
-* <code>src/App.js</code>   
-* <code>src/components/AppHeader.js</code> 등등 UI 나눈것 넣기   
-* js파일 안에는 <code>export defalt{}</code> 블럭 안에 템플릿 정의한 내용을 넣는다.    
+* ```src/App.js```   
+* ```src/components/AppHeader.js``` 등등 UI 나눈것 넣기   
+* js파일 안에는 ```export defalt{}``` 블럭 안에 템플릿 정의한 내용을 넣는다.    
 ```js
 export default{
   template: `
@@ -601,8 +601,8 @@ export default{
   `
 }
 ```
-* <code>src/main.js</code> 파일을 만들고 html파일에서 component 정의한 내용을 넣어준다.
-* 상단에는 나눠놓은 컴포넌트를 <code>@import</code>로 불러온다.
+* ```src/main.js``` 파일을 만들고 html파일에서 component 정의한 내용을 넣어준다.
+* 상단에는 나눠놓은 컴포넌트를 ```@import```로 불러온다.
 ```js
 import App from './App.js'
 import AppHeader from './components/AppHeader.js'
@@ -621,14 +621,14 @@ app.mount('#app');
 ```
 
 * 루트 디렉토리 index 파일의 script를 모두 지우고 main.js를 모듈  타입으로 불러온다.
-<code><script type="module" src="./src/main.js"></script></code>
+```<script type="module" src="./src/main.js"></script>```
 
 ## 컴포넌트 만들기_SFC
 > 확장자 .vue를 갖는다.
-> 문자열 템플릿에서 <code>template: ``~~``</code> 안에 있던 태그를 그대로 <code><template></template></code> 안에 넣는다.   
-> js 코드는 <code>export default{}</code>안에 넣는다.   
-> style 태그는 <code><style></style></code>안에 넣는다.   
-> html, js, css가 <code>캡슐화</code>되어있다.
+> 문자열 템플릿에서 ```template: ``~~````` 안에 있던 태그를 그대로 ```<template></template>``` 안에 넣는다.   
+> js 코드는 ```export default{}```안에 넣는다.   
+> style 태그는 ```<style></style>```안에 넣는다.   
+> html, js, css가 ```캡슐화```되어있다.
 ```vue
 <!-- 기본 구조 -->
 <template>
@@ -712,8 +712,8 @@ export default {
 
 ### 반응형 API (Reactivity API)
 반응하는 데이터와 관련된 API 세트.
-* <code>ref()</code>
-* <code>isRef()</code> 반응형 데이터인지 검사하는 api.
+* ```ref()```
+* ```isRef()``` 반응형 데이터인지 검사하는 api.
 * 아래 예시는 ref()를 활용하여 btn 클릭시 '!'를 추가하는 로직이다.
 * 반응형 데이터와 일반 데이터의 로직을 비교해보길.
 ```vue
@@ -789,7 +789,7 @@ export default{
 </template>
 ```
 2. 컴포넌트 인스턴스에서 사용한다. <br />
-<code>this</code> 키워드로 접근 가능하다.
+```this``` 키워드로 접근 가능하다.
 ```vue
 ...
   setup(){
@@ -821,7 +821,7 @@ export default{
 > > context.slot   
 > > context.emit   
 > > context.expose
-또는 <code>setup(props, {attrs, slots, emit, expose})</code>
+또는 ```setup(props, {attrs, slots, emit, expose})```
 
 
 ### 종속성 주입(Dependency Infection)
@@ -829,7 +829,7 @@ export default{
 ### 템플릿 문법
 이중 중괄호를 사용해 데이터에 바인딩할 수 있다.   
 
-#### <code>v-once</code> 데이터가 변경되어도 갱신하지 않는 일회성 보간.
+#### ```v-once``` 데이터가 변경되어도 갱신하지 않는 일회성 보간.
 ```vue
 <p v-once>문자열: {{ message }}</p>
 ```
@@ -857,14 +857,14 @@ export default {
 
 ```
 
-#### <code>v-html</code> <br />  
-> 실제 HTML을 출력하려면 <code>v-html</code> 디렉티브를 사용한다.   
+#### ```v-html``` <br />  
+> 실제 HTML을 출력하려면 ```v-html``` 디렉티브를 사용한다.   
 > XSS 취약점으로 이어질 수 있어, 신뢰할 수 있는 콘텐츠에서만 사용한다.   
 ```html
 <p v-html="rawHtml"></p>
 
 ``` 
-#### <code>v-bind</code> 속성 바인딩
+#### ```v-bind``` 속성 바인딩
 v-bind / :
 ```vue
 <template>
@@ -1021,7 +1021,7 @@ export default {
 ```
 
 ##### 반응성을 잃지 않으면서 구조분해할당을 하려면?
-###### <code>toRefs()</code>
+###### ```toRefs()```
 > 구조분해할당 여러개 할 때 사용.   
 > 원래 있던 객체의 속성과, 구조분해해서 재할당한 반응형 상태는 서로 동기화된다.   
 
@@ -1032,7 +1032,7 @@ export default {
 ```
 
 
-###### <code>toRef()</code>
+###### ```toRef()```
 > 구조분해할당 한 개씩만 가져올 때 사용.   
 > 두 번째 파라미터로 가져오고 싶은 속성을 넣으면 된다.   
 ```vue
@@ -1043,7 +1043,7 @@ export default {
 ```
 
 
-#### <code>readonly</code>
+#### ```readonly```
 반응형 객체의 변경을 방지한다.
 
 ```vue
@@ -1051,7 +1051,7 @@ const copy = readonly(original);
 
 ```
 
-### <code>computed</code>
+### ```computed```
 계산된 결과를 보여준다. 템플릿에 적으면 코드가 복잡하니 setup()안에 computed() 정의하여 코드를 깔끔하게 한다.
 > '캐시된다.' 계산된 결과를 보관하고 있다가 다음에 또 요청될때 캐시된 데이터를 돌려준다. (일반 메서드는 실행될 때마다 몇 번이고 계산된다.)   
 > 반응형 데이터가 변경될 때, 캐시가 다시 계산된다.   
@@ -1108,7 +1108,7 @@ export default {
 
 
 # HTML 클래스 바인딩
-## <code>v-bind / :</code>
+### ```v-bind / :```
 > 일반 클래스와 바인드된 클래스는 공존할수 있다.   
 > 여러 class를 넣으려면 콤마(,)로 구분한다.   
 ```vue
@@ -1133,7 +1133,7 @@ const classObject = reactive({
 
 ```
 
-## inline Style 
+### inline Style 
 ```vue
 <div :style="styleObject">
 
