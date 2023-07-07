@@ -1395,7 +1395,7 @@ input에 키보드로 입력할 때마다 onKeyupHandler 이벤트가 연결되�
 
 #### 키 수식어
 키보드 이벤트를 수신할 때 특정 키를 확인해야 하는 경우.
-- ```.enter``
+- ```.enter```
 - ```.tag```
 - ```.delete```
 - ```.esc```
@@ -1411,3 +1411,35 @@ input에 키보드로 입력할 때마다 onKeyupHandler 이벤트가 연결되�
 - ```.alt```
 - ```.shift```
 - ```.meta``` MAC:command / Window: Win
+
+
+# 양방향 바인딩
+FE에서 입력 양식을 처리할 때, value상태와 js의 반응형 상태를 동기화해야할 경우가 있다. js로 처리할 수 있지만, v-model 디렉티브로 간단히 처리할 수 있다.
+
+### ```v-model```
+#### js로 처리
+```html
+<input type="text" :value="inputValue" @input="event => (inputValue = event.target.value)" />
+```
+#### v-model 디렉티브로 처리
+```html
+<input type="text" v-model="inputValue" />
+```
+
+v-model은 내부적으로 html요소에 따라 서로 다른 속성과 이벤트를 사용한다.
+#### checkbox, radio, select
+- @change
+- checkbox에서 true-value="값", false-value="값" 속성을 넣으면, true/false일 때 출력할 값을 정할 수 있다.
+
+#### v-model 수식어
+
+##### .lazy
+default는 input 이벤트 후 입력과 데이터를 동기화한다. .lazy 수식어를 추가하여 change 이벤트 이후에 동기화할 수 있다. (변경하는 중엔 동기화가 안 되고, 포커스가 떨어졌을 때 동기화된다.)
+
+#### .number
+자동으로 number 타입으로 형변환. 
+
+
+#### .trim
+앞뒤 공백 제거.
+
