@@ -87,11 +87,11 @@ printThis();
 
 ### 이벤트 전파   
 > 캡쳐링   
-> > 최상위 요소부터 하위 요소까지 이벤트 전파   
+> 최상위 요소부터 하위 요소까지 이벤트 전파   
 
 
 > 버블링   
-> > 타겟 요소부터 이벤트가 전파되어 최상위 요소까지 올라가는 것   
+> 타겟 요소부터 이벤트가 전파되어 최상위 요소까지 올라가는 것   
 ```js
 event.stopPropagation(); // 이벤트 전파 멈춤.
 event.preventDefault();  // 기본 기능을 막음(ex. 앵커태그)
@@ -622,11 +622,11 @@ app.mount('#app');
 ```<script type="module" src="./src/main.js"></script>```
 
 ## 컴포넌트 만들기_SFC
-> 확장자 .vue를 갖는다.
-> 문자열 템플릿에서 ```template: ``~~````` 안에 있던 태그를 그대로 ```<template></template>``` 안에 넣는다.   
-> js 코드는 ```export default{}```안에 넣는다.   
-> style 태그는 ```<style></style>```안에 넣는다.   
-> html, js, css가 ```캡슐화```되어있다.
+> 확장자 .vue를 갖는다.   
+> 문자열 템플릿에서 ```template: `~~` ``` 안에 있던 태그를 그대로 ```<template></template>``` 안에 넣는다.      
+> js 코드는 ```export default{}```안에 넣는다.     
+> style 태그는 ```<style></style>```안에 넣는다.    
+> html, js, css가 ```캡슐화```되어있다.   
 ```vue
 <!-- 기본 구조 -->
 <template>
@@ -1345,13 +1345,13 @@ export default {
 ### ``` v-on(@) ```
 
 ### 메소드 이벤트 핸들러 
-`` 
+```
 const eventInfo = (message) => {
 	console.log...
 }
 <button @click="eventInfo"></button> 
- ```
 
+```
 >	 v-on 디렉티브에서 메소드를 호출할 수 있습니다. 이 때, 매개변수로 event 객체를 받는다.
 
 
@@ -1380,14 +1380,16 @@ input에 키보드로 입력할 때마다 onKeyupHandler 이벤트가 연결되�
 
 
 ### 이벤트 수식어
->	e.preventDefault() , e.stopPropagation()는 비효율적이라 그 대신에 Vue는 ```v-on``` 이벤트에 다양한 수식어를 제공한다.
->	 여러 기능을 함께 사용 가능하다.  ```<a href="https://naver.com" @click.prevent.stop="clickA">A영역</a>```
+>	e.preventDefault() , e.stopPropagation()는 비효율적이라 그 대신에 Vue는 ```v-on``` 이벤트에 다양한 수식어를 제공한다.   
+>	 여러 기능을 함께 사용 가능.  
+>  ```<a href="https://naver.com" @click.prevent.stop="clickA">A영역</a>```   
 - ```.stop``` = ```e.stopPropagation()``` 이벤트 버블링을 막는다.
 -	```.prevent``` = ```e.preventDefault()``` tag가 가지고 있는 기능을 막는다.
 -	```.capture``` 캡쳐 모드를 사용해 이벤트 리스너를 사용 가능하다. 먼저 이벤트를 실행할 때 사용한다.
 -	```.self``` 오로지 자기 자신만 호출한다. 타깃요소가 self(나 자신)일때 발동.
 - ```.once``` 한 번만 실행한다.
-- ```.passive``` 모바일 장치의 성능을 개선하기 위해 터치이벤트 리스너와 사용된다. ```<div @scroll.passive="onScroll">..</div>```
+- ```.passive``` 모바일 장치의 성능을 개선하기 위해 터치이벤트 리스너와 사용된다. 
+		```<div @scroll.passive="onScroll">..</div>```
 
 
 #### 키 수식어
