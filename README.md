@@ -88,6 +88,8 @@ printThis();
 ### 이벤트 전파   
 > 캡쳐링   
 > > 최상위 요소부터 하위 요소까지 이벤트 전파   
+
+
 > 버블링   
 > > 타겟 요소부터 이벤트가 전파되어 최상위 요소까지 올라가는 것   
 ```js
@@ -132,7 +134,7 @@ students.map((student) => student.en)
 ```
 
 #### some()
-> 요소를 한 번씩 순회하며, 주어진 함수가 한 번이라도 true라도 나오면 true 반환한다.   
+> 요소를 한 번씩 순회하며, 주어진 함수가 한 번이라도 true가 나오면 true를 반환한다.   
 ```js
 const fruits = ["사과", "딸기", "배", "참외];
 fruits.some((fruit) => fruit === "배"; )
@@ -329,15 +331,11 @@ alias: 단축 url 지정.
 > public: 정적 자산   
 > src/assets: webpack이나 vite와 같은 빌드 도구의 영향을 받는 images나 css와 같은 정적 자산을 놓는 곳.   
 > src/App.vue: 루트 컴포넌트.   
-> > index.html 렌더링    
-> > -> main.js 렌더링 
-> > ```import { createApp } from 'vue' ```  
-> > ```import App from './App.vue'```   
-> > ```createApp(App).mount('#app')```   
-> > createApp는 뷰 인스턴스를 생성하는 메서드.    
-> > 루트 컴포넌트인 APP가 메서드 안에 들어감.   
-> > 생성된 뷰 인스턴스는 #app에 마운트됨.   
-> > 루트 컴포넌트가 렌더링 됨.   
+> > ```index.html``` -> ```main.js``` 렌더링    
+> > ```import { createApp } from 'vue' ```  createApp는 뷰 인스턴스를 생성하는 메서드.    
+> > ```import App from './App.vue'```루트 컴포넌트인 APP가 메서드 안에 들어감.   
+> > ```createApp(App).mount('#app')``` 생성된 뷰 인스턴스는 #app에 마운트됨.    
+> > 루트 컴포넌트가 렌더링 됨. 
 ### .eslintrc.cjs - ESLint 셋팅
 #### plugin:vue/vue3-essential
 > .eslintrc.cjs에 이미 설정된 것은 <a href="v3.ko.vuejs.org/style-guide" target="_blank" >스타일가이드 공식문서</a>에서 정의된 필수 요소(essential)만 추가된 것.   
@@ -1386,7 +1384,6 @@ input에 키보드로 입력할 때마다 onKeyupHandler 이벤트가 연결되�
 >	 여러 기능을 함께 사용 가능하다.  ```<a href="https://naver.com" @click.prevent.stop="clickA">A영역</a>```
 - ```.stop``` = ```e.stopPropagation()``` 이벤트 버블링을 막는다.
 -	```.prevent``` = ```e.preventDefault()``` tag가 가지고 있는 기능을 막는다.
-- 
 -	```.capture``` 캡쳐 모드를 사용해 이벤트 리스너를 사용 가능하다. 먼저 이벤트를 실행할 때 사용한다.
 -	```.self``` 오로지 자기 자신만 호출한다. 타깃요소가 self(나 자신)일때 발동.
 - ```.once``` 한 번만 실행한다.
@@ -1427,19 +1424,19 @@ FE에서 입력 양식을 처리할 때, value상태와 js의 반응형 상태�
 ```
 
 v-model은 내부적으로 html요소에 따라 서로 다른 속성과 이벤트를 사용한다.
-#### checkbox, radio, select
+#### ```checkbox, radio, select```
 - @change
 - checkbox에서 true-value="값", false-value="값" 속성을 넣으면, true/false일 때 출력할 값을 정할 수 있다.
 
 #### v-model 수식어
 
-##### .lazy
+##### ```.lazy```
 default는 input 이벤트 후 입력과 데이터를 동기화한다. .lazy 수식어를 추가하여 change 이벤트 이후에 동기화할 수 있다. (변경하는 중엔 동기화가 안 되고, 포커스가 떨어졌을 때 동기화된다.)
 
-#### .number
+#### ```.number```
 자동으로 number 타입으로 형변환. 
 
 
-#### .trim
+#### ```.trim```
 앞뒤 공백 제거.
 
