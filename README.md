@@ -239,17 +239,7 @@ output:{
 }
 ```
 
-#### bootstrap 5 설치
-UI 프레임워크
 
-1. npm install bootstrap bootstrap-vue
-2. main.js에 import 'bootstrap/dist/css/bootstrap.min.css';
-3. main.js에 마운트 다음줄에 import 'bootstrap/dist/js/bootstrap.js';
-4. npm run dev
-5. getbootstrap.com에서 ui 가져오기
-
-* vuetify
-vue에 특화된 UI 프레임워크
 
 
 
@@ -1051,6 +1041,7 @@ const copy = readonly(original);
 
 ### ```computed```
 계산된 결과를 보여준다. 템플릿에 적으면 코드가 복잡하니 setup()안에 computed() 정의하여 코드를 깔끔하게 한다.
+반응형 데이터(ref,reactive)의 종속 관계를 자동으로 세팅할 때.
 > '캐시된다.' 계산된 결과를 보관하고 있다가 다음에 또 요청될때 캐시된 데이터를 돌려준다. (일반 메서드는 실행될 때마다 몇 번이고 계산된다.)   
 > 반응형 데이터가 변경될 때, 캐시가 다시 계산된다.   
 > 기본적으로 getter(읽기)전용이다. 새 값을 할당하려 하면 오류 표시된다.     
@@ -1345,6 +1336,7 @@ export default {
 ### ``` v-on(@) ```
 
 ### 메소드 이벤트 핸들러 
+v-on 디렉티브에서 메소드를 호출할 수 있다. 이 때, 매개변수로 event 객체를 받는다.
 ```
 const eventInfo = (message) => {
 	console.log...
@@ -1352,7 +1344,7 @@ const eventInfo = (message) => {
 <button @click="eventInfo"></button> 
 
 ```
->	 v-on 디렉티브에서 메소드를 호출할 수 있습니다. 이 때, 매개변수로 event 객체를 받는다.
+
 
 
 ### 이벤트 객체(다이렉트로)접근
@@ -1442,3 +1434,144 @@ default는 input 이벤트 후 입력과 데이터를 동기화한다. .lazy 수
 #### ```.trim```
 앞뒤 공백 제거.
 
+
+# Watch, WatchEffect
+
+### Watch
+반응형 '상태가 변경될 때'마다 '특정 작업'을 수행한다.
+또다른 DOM을 조작하고, 또다른 API를 호출해서 상태를 변경할 때 그것을 추적한다.
+ 명시적이다.'어떠한 데이터를 감시하겠다'
+```vue
+const message = ref('hello Vue3')
+
+watch(message, (newValue, oldValue) => {
+	console.log('newValue: ', newValue);
+	console.log('oldValue: ', oldValue);
+});
+
+
+watch(감지할 반응형 데이터, (변경된 새로운 값, 이전 값) => {
+
+})
+
+```
+
+#### 감지할 데이터
+ref, reactive, computed, getter(), array..
+
+#### getter
+특정 오브젝트의 속성(ex:number)를 감지하려면 getter함수를 넣는다.
+getter함수로부터 받은 값이 변경되었을때만 감지한다.
+```vue
+watch(
+			() => obj.count,
+			(newValue, oldValue) => {
+				console.log('newValue: ', newValue);
+			},
+		);
+```
+
+#### deep option
+반응형 객체를 직접 watch()하면 깊은 감시자가 생성된다.
+모든 중첩된 속서에도 트리거된다.
+
+#### immediate 즉시 실행
+최초에 즉시 실행.
+watch함수의 매개변수로 넣는다.
+immediate: true,
+
+또는 변수 안에 함수로 담아서 watch함수의 두 번째 매개변수로 넣고,
+함수를 선언 및 return.한다.
+```vue
+import { ref, watch } from 'vue';
+
+export default {
+	setup() {
+		const message = ref('hello');
+		const reverseMessage = ref('');
+
+		const reverseFunction = () => {
+			reverseMessage.value = message.value.split('').reverse().join('');
+		};
+
+		watch(message, reverseFunction);
+		reverseFunction();
+		return { message, reverseMessage };
+	},
+};
+```
+
+### WatchEffect
+최초로 즉시 실행된다.
+콜백함수 안에서 사용한 반응형 api만 감시한다.
+```vue
+watchEffect(() => {
+			console.log('watchEffect');
+			save(title.value, contents.value);
+		});
+```
+
+### bootstrap 5 설치
+UI 프레임워크
+
+1. npm install bootstrap bootstrap-vue
+2. main.js에 import 'bootstrap/dist/css/bootstrap.min.css';
+3. main.js에 마운트 다음줄에 import 'bootstrap/dist/js/bootstrap.js';
+4. npm run dev
+5. getbootstrap.com에서 ui 가져오기
+
+* vuetify
+vue에 특화된 UI 프레임워크
+
+
+# 컴포넌트 기초
+
+### 전역 등록
+컴포넌트를 사용하지 않더라도 최종 빌드에 해당 컴포넌트가 포함되어 파일의 크기를 증가시킨다.
+컴포넌트간 종속 관계를 확인하기 힘들다.
+```app.component()```
+```vue
+import { createApp } from 'vue';
+import App from './App.vue';
+
+import GlobalComponent from './components/GlobalComponent.vue';
+
+const app = CreateApp(App)
+// 한 개일 경우
+app.component('GlobalComponent', GlobalComponent)
+
+//여러 개일 경우
+app
+	.component('ComponentA', ComponentA)
+	.component('ComponentB', ComponentB)
+	.component('ComponentC', ComponentC)
+
+app.mount('#app');
+
+```
+
+### 지역 등록
+부모 컴포넌트 안에서만 사용 가능하다.
+```vue
+import ChildComponent from './ChildComponent.vue'
+
+export default {
+	components:{
+		ChildComponent
+	},
+	setup(){
+		..
+	}
+}
+
+```
+
+
+### 파일 명
+- 케밥 케이스나 파스칼 케이스로 짓는다.
+- 베이스 컴포넌트 이름(button, icon, table..) 접두사로는 Base, App, V를 붙인다. VButton, VTable, VIcon..
+- 싱글 인스턴스 컴포넌트 이름은 (layout, header, sidenav..) 접두사로 The를 붙인다. TheNav, TheHeader, TheFooter..
+
+
+# SFC (single file component)
+template + script + style 세 개의 블록을 갖고 있다.
