@@ -1,43 +1,57 @@
 <template>
 	<div class="card">
-		<img src="..." class="card-img-top" alt="..." />
 		<div class="card-body">
-			<h5 class="card-title red">Card title</h5>
+			<!-- type: news, notice -->
+			<span class="badge bg-secondary">{{ typeName }}</span>
+			<h5 class="card-title red mt-2">{{ title }}</h5>
 			<p class="card-text">
-				Some quick example text to build on the card title and make up the bulk
-				of the card's content.
+				{{ contents }}
 			</p>
-			<a href="#" class="btn btn-primary">Go somewhere</a>
+			<a href="#" class="btn" :class="isLikeClass">좋아요</a>
 		</div>
 	</div>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { computed } from 'vue';
 
 export default {
-	setup() {
-		const color = ref('red');
-		color.value = 'yellow';
-		return { color };
+	props: {
+		type: {
+			type: String,
+			default: 'news',
+			validator: value => {
+				return ['news', 'notice'].includes(value); //값에  news와 notice만 포함한다. 그 외에는 console에 경고문 뜬다.
+			},
+		},
+		title: {
+			type: String,
+			required: true,
+		},
+		contents: {
+			type: String,
+			required: true,
+		},
+		isLike: {
+			type: Boolean,
+			default: false,
+		},
+		// 객체나 배열과 같은 레퍼런스 타입의 default를 설정할 경우에는 기본값을 반환하는 팩토리함수를 설정해야 한다.
+		obj: {
+			type: Object,
+			default: () => ({}),
+		},
+	},
+	setup(props) {
+		const isLikeClass = computed(() =>
+			props.isLike ? 'btn-danger' : 'btn-outline-danger',
+		);
+		const typeName = computed(() =>
+			props.type === 'news' ? '뉴스' : '공지사항',
+		);
+		return { isLikeClass, typeName };
 	},
 };
 </script>
 
-<style>
-.red {
-	color: v-bind(color);
-}
-</style>
-
-<!-- <style module="classes">
-.red {
-	color: red !important;
-}
-</style> -->
-
-<!-- <style scoped>
-.red {
-	color: red !important;
-}
-</style> -->
+<style></style>
