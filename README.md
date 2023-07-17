@@ -913,7 +913,32 @@ export default {
 </template>
 
 ```
- 
+
+##### v-bind in css
+SFC style태그는 v-bind css 기능을 사용하여, css 값을 동적으로 변경할 수 있다.
+```vue
+<template>
+	<h5 class="red">Card title</h5>
+</template>
+<script>
+import { ref } from 'vue';
+
+export default {
+	setup() {
+		const color = ref('red');
+		color.value = 'yellow';
+		return { color };
+	},
+};
+</script>
+
+<style>
+.red {
+	color: v-bind(color);
+}
+</style>
+
+```
 
 
 ### 반응형 상태 선언하기
@@ -1575,3 +1600,74 @@ export default {
 
 # SFC (single file component)
 template + script + style 세 개의 블록을 갖고 있다.
+
+### <template>
+>	각 *.vue 파일은 오직 하나의 top-level <template></template> 블록을 포함한다.   
+>	콘텐츠는 추출되어 ```@vue/compiler-dom``` 으로 전달되고, JS 렌더 기능으로 사전 컴파일되고, render 옵션으로 내보내어 컴포넌트에 첨부된다.
+
+### <script>와 <script setup>
+> 이 둘은 따로국밥이다. 한 파일에 공존이 가능하다. 한 파일에 각각 한 개씩만 포함할 수 있다.   
+> script setup은 사전에 처리되어 컴포넌트의 setup()함수로 사용된다. 
+
+### <style>
+>	여러 개의 스타일 블럭이 포함될 수 있다.
+>	스타일 모듈화를 위해 scoped 또는 module 속성을 가질 수 있다.
+#### scoped
+현재 컴포넌트의 요소에만 적용된다.
+특수 속성이 선언되고, 그 속성을 갖고 있는 엘리먼트에게만 스타일이 적용된다.
+```css
+<style scoped>
+.red {
+	color: red !important;
+}
+</style>
+```
+
+#### module
+class에 바인딩하여 쓴다.
+```vue
+<template>
+	<p :class="$style.red">text</p>
+</template>
+
+<style module>
+.red {
+	color: red !important;
+}
+</style>
+```
+모듈 속성에 값을 지정하여 주입된 클래스 객체의 속성 키를 변경할 수 있다.
+```vue
+<template>
+	<p :class="classes.red">text</p>
+</template>
+
+<style module="classes">
+.red {
+	color: red !important;
+}
+</style>
+```
+
+
+
+
+### 사용자 정의 블록
+- vue-i18n : 다국어 지원 블록
+
+### 전처리기
+```lang``` 속성을 사용하여 전처리기 언어를 선언할 수 있다. script엔 보통 ts를 선언한다.
+```js
+<script lang="ts">
+	//use TS
+</script>
+```
+style태그에 scss를 선언할 수도 있다.
+```scss
+<style lang="scss">
+// use scss
+</style>
+```
+
+
+# props
