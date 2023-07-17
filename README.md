@@ -16,7 +16,7 @@
 > 트리 구조(document 안 구조) / 노드(각각의 객체)   
 > document : dom tree 최상위 모델 (dom model진입점) 
 
-### BOM(브라우저 객체 모델) Brouser oject model   
+### BOM(브라우저 객체 모델) Browser Object Model.   
 > 브라우저를 제어할 수 있도록 모델링하는것   
 > window - 브라우저 창   
 > document - 문서에 대한 정보 have   
@@ -1121,7 +1121,7 @@ export default {
 ```
 
 
-# HTML 클래스 바인딩
+# HTML 클래스 바인딩✨
 ### ```v-bind / :```
 > 일반 클래스와 바인드된 클래스는 공존할수 있다.   
 > 여러 class를 넣으려면 콤마(,)로 구분한다.   
@@ -1202,7 +1202,7 @@ export default {
 
 ```
 
-# 조건부 렌더링
+# 조건부 렌더링✨
 
 ### ```v-if```
 > js 문법과 흡사하다. 참: 보임 / 거짓: 안보임      
@@ -1284,7 +1284,7 @@ export default {
 
 ```
 
-# 목록 렌더링
+# 목록 렌더링✨
 
 ### ```v-for```
 > 배열인 목록을 렌더링할 수 있다.
@@ -1336,7 +1336,7 @@ export default {
 </script>
 ```
 
-# 디렉티브
+# 디렉티브✨
 
 ## 디렉티브 구성
 - v-on:submit.pervent="onSubmit"
@@ -1357,7 +1357,7 @@ export default {
 >	데이터 변경에 대한 캐시를 쌓아놨다가 따로 적어놓은 배열 값 x,y,z이 업데이트 되었을때만 한꺼번에 데이터를 변경한다.
 
 
-# 이벤트 처리
+# 이벤트 처리✨
 ### ``` v-on(@) ```
 
 ### 메소드 이벤트 핸들러 
@@ -1429,7 +1429,7 @@ input에 키보드로 입력할 때마다 onKeyupHandler 이벤트가 연결되�
 - ```.meta``` MAC:command / Window: Win
 
 
-# 양방향 바인딩
+# 양방향 바인딩✨
 FE에서 입력 양식을 처리할 때, value상태와 js의 반응형 상태를 동기화해야할 경우가 있다. js로 처리할 수 있지만, v-model 디렉티브로 간단히 처리할 수 있다.
 
 ### ```v-model```
@@ -1460,7 +1460,7 @@ default는 input 이벤트 후 입력과 데이터를 동기화한다. .lazy 수
 앞뒤 공백 제거.
 
 
-# Watch, WatchEffect
+# Watch, WatchEffect✨
 
 ### Watch
 반응형 '상태가 변경될 때'마다 '특정 작업'을 수행한다.
@@ -1549,7 +1549,7 @@ UI 프레임워크
 vue에 특화된 UI 프레임워크
 
 
-# 컴포넌트 기초
+# 컴포넌트 기초✨
 
 ### 전역 등록
 컴포넌트를 사용하지 않더라도 최종 빌드에 해당 컴포넌트가 포함되어 파일의 크기를 증가시킨다.
@@ -1598,7 +1598,7 @@ export default {
 - 싱글 인스턴스 컴포넌트 이름은 (layout, header, sidenav..) 접두사로 The를 붙인다. TheNav, TheHeader, TheFooter..
 
 
-# SFC (single file component)
+# SFC (single file component)✨
 template + script + style 세 개의 블록을 갖고 있다.
 
 ### <template>
@@ -1670,4 +1670,170 @@ style태그에 scss를 선언할 수도 있다.
 ```
 
 
-# props
+# Props(프롭스)✨
+> 컴포넌트에 등록할 수 있는 사용자 정의 속성.   
+> 부모 컴포넌트에서 자식 컴포넌트에서 데이터를 전달하는 방법.   
+> 외부에서 데이터를 전달받을 수 있다.   
+
+##### 자식 컴포넌트 (AppCard.vue)
+1. script에 props 옵션 선언
+```js
+export default{
+	props: ['title', 'contents'],
+}
+```
+2.  템플릿 안에서 문자열 템플릿 삽입
+```html
+<h5>{{ title }}</h5>
+<p>{{ contents }}</p>
+```
+
+##### 부모 컴포넌트 (TheView.vue)
+3. [정적] 자식 컴포넌트 속성에 값 넣기.
+```html
+<div><AppCard title="제목1" contents="내용1"></AppCard></div>
+```
+
+3. [동적] 자식 컴포넌트 속성에 v-bind로 값 넣기.
+```html
+<div><AppCard :title="post.title" :contents="post.contents"></AppCard></div>
+...
+```
+```js
+setup(){
+	const post = reactive({
+		title: "제목1",
+		contents: "내용1"
+	})
+	return { post }
+}
+```
+
+3. [배열] v-for 사용. 가장 효율적인 방법.
+
+```html
+<div v-for="post in posts" key="post.id"><AppCard :title="post.title" :contents="post.contents"></AppCard></div>
+...
+```
+```js
+setup(){
+	const posts = reactive([
+		{id: 1, title: "제목1", contents: "내용1"},
+	...
+		{id: 5, title: "제목5", contents: "내용5"},
+	])
+	return { posts }
+}
+```
+
+4. [조건] 연산자를 이용해 조건에 따라 출력.
+- 자식 컴포넌트에서 조건 설정
+```html
+<span class="badge bg-secondary">{{ type === 'news' ? '뉴스' : '공지사항'}}</span>
+// type이 'news'이면 '뉴스'를 출력하고, 그게 아니라면 '공지사항'을 출력한다.
+```
+- 부모 컴포넌트에서 배열의 값 설정
+```js
+const posts = reactive([
+			{ id: 1, title: '제목1', contents: '내용1', isLike: false, type: 'news' },
+			{
+				id: 2,
+				title: '제목2',
+				contents: '내용2',
+				isLike: true,
+				type: 'notice',
+			},
+....
+```
+
+- 부모 컴포넌트의 템플릿에서 v-bind 데이터 바인딩.
+```html
+<AppCard
+		:title="post.title"
+		:contents="post.contents"
+		:type="post.type"
+		:isLike="post.isLike"
+	></AppCard>
+```
+
+
+#### Props 선언
+> 문자열 배열 선언과 객체타입 선언이 있는데, 객체타입으로 가능한 상세하게 정의해야 한다.   
+> 컴포넌트에 ```props``` 옵션을 사용하여 선언한다.   
+> 객체 타입으로 선언할 때의 속성(파스칼 표기법으로, 맨 앞은 꼭 영어 대문자.)   
+>	> type : String, Number, Boolean, Array, Object, Date, Function, Symbol 모든 기본 생성자 또는 모든 사용자 정의 타입이 올 수 있다.(Person Animal)   
+>	> default : 속성값이 비어있거나 undefined를 전달 받는경우 기본값을 선언할 수 있다.    
+>	>	> 객체나 배열과 같은 레퍼런스 타입의 default를 설정할 경우에는 기본값을 반환하는 팩토리함수를 설정해야 한다.   
+>	> required : 속성이 필수값이라면 true로 설정.     
+>	> validator : 유효성 검사가 필요할 때 사용한다.   
+
+```js
+props: {
+	type: {
+		type: String,
+		default: 'news',
+		validator: value => {
+			return ['news', 'notice'].includes(value); //값에  news와 notice만 포함한다. 그 외에는 console에 경고문 뜬다.
+		},
+	},
+	title: {
+		type: String,
+		required: true,
+	},
+	contents: {
+		type: String,
+		required: true,
+	},
+	isLike: {
+		type: Boolean,
+		default: false,
+	},
+	// 객체나 배열과 같은 레퍼런스 타입의 default를 설정할 경우에는 기본값을 반환하는 팩토리함수를 설정해야 한다.
+	obj: {
+		type: Object,
+		default: () => ({})
+	}
+},
+```
+
+#### Props 사용
+> 선언된 props를 template에서 바로 사용할 수 있다.  ```<p>{{ title }}</p>```   
+> setup()함수의 첫 번째 매개변수로 props 객체를 받아 사용할 수 있다.
+
+##### v-if를 props의 class 데이터 바인딩(computed, v-bind)을 사용하여 클린하게 변경하기 
+
+원래 코드
+```html
+<span class="badge bg-secondary">{{ type === 'news' ? '뉴스' : '공지사항'}}</span>
+<a v-if="isLike" href="#" class="btn btn-danger">좋아요</a>
+<a v-else href="#" class="btn btn-outline-danger">좋아요</a>
+```
+
+수정된 코드
+```html
+<span class="badge bg-secondary">{{ typeName }}</span>
+<a href="#" class="btn" :class="isLikeClass">좋아요</a>
+```
+
+```js
+setup(props) {
+		const isLikeClass = computed(() =>
+			props.isLike ? 'btn-danger' : 'btn-outline-danger',
+		);
+		const typeName = computed(() =>
+			props.type === 'news' ? '뉴스' : '공지사항',
+		);
+		return { isLikeClass, typeName };
+	},
+```
+
+##### 객체를 사용하여 다중 속성 전달
+v-bind로 사용해서 전달할 수 있다.(위에서 서술)
+
+##### 단방향 데이터 흐름
+> 모든 props는 상위속성과 하위 속성간에 단방향 바인딩으로 형성되어있다.   
+> 상위 속성이 업데이트되면 하위 속성이 업데이트되지만, 하위에서 상위로의 업데이트는 안된다.   
+> 자식 컴포넌트에서 상위 컴포넌트로 이벤트를 전달하려면 emit을 사용한다.  
+
+##### 객체 / 배열 Props 업데이트
+이러한 레퍼런스 타입을 속성으로 전달할 때 주의할 점이 있다.
