@@ -1670,7 +1670,7 @@ style태그에 scss를 선언할 수도 있다.
 ```
 
 
-# Props(프롭스)✨
+# ```Props```(프롭스)✨ 부모---data--->자식
 > 컴포넌트에 등록할 수 있는 사용자 정의 속성.   
 > 부모 컴포넌트에서 자식 컴포넌트에서 데이터를 전달하는 방법.   
 > 외부에서 데이터를 전달받을 수 있다.   
@@ -1837,3 +1837,170 @@ v-bind로 사용해서 전달할 수 있다.(위에서 서술)
 
 ##### 객체 / 배열 Props 업데이트
 이러한 레퍼런스 타입을 속성으로 전달할 때 주의할 점이 있다.
+
+#### Boolean Casting
+
+# ```emit``` ✨ 자식 ---event---> 부모
+자식 컴포넌트에서 부모 컴포넌트로 데이터 전달 또는 트리거
+```emit``` 메서드로 구현 가능하다.
+
+부모 컴포넌트
+```html
+<PostCreate @create-post="createPost"></PostCreate>
+```
+```js
+const createPost = (a, b, c, d) => {
+	console.log('createPost', a, b, c, d);
+};
+```
+
+```자식 컴포넌트```는 세 가지 방법으로 구현할 수 있다.
+
+1. 컴포넌트 내장 메서드로 구현하는 방법
+> 이벤트를 부모에게 올릴 때, 변수 뿐만 아니라 파라미터도 넘길 수 있다.   
+
+```html
+<button class="btn btn-primary" @click="$emit('createPost', 1, 2, 3, '냥냥')">button</button>
+```
+
+
+2. setup()의 두 번째 파라미터인 context 객체의 emit 메서드로 구현하는 방법
+> 자식에게 파라미터 값이 있으면 이벤트와 함께 받을 수 있다.
+```html
+<button class="btn btn-primary" @click="createPost">button</button>
+```
+```js
+export default {
+	setup(props, context) {
+		const createPost = () => {
+			context.emit('createPost', 1, 2, 3, '냥냥');
+		};
+		return { createPost };
+	},
+};
+```
+
+3. 구조분해할당 
+> 객체로 emit 메서드를 가져온다.
+> 마크업은 위와 동일.      
+```js
+export default {
+	setup(props, { emit }) {
+		const createPost = () => {
+			emit('createPost', 1, 2, 3, '냥냥');
+		};
+		return { createPost };
+	},
+};
+```
+
+## emits 이벤트 선언 (vue3)
+이벤트를 선언하지 않아도 동작하지만, 잘 문서화하기 위해서 이벤트를 선언해야 한다.
+
+1. 문자열 배열 선언
+```js
+export default {
+emits: ['createPost'],
+..
+```
+2. 객체문법 선언
+> validation 로직 추가 가능. 필요없으면 null 선언
+> 이벤트명 선언(createPost)
+> 우리가 넘기는 파라미터(newTitle)가 이벤트명의 매개변수가 된다.
+> 유효성 체크에 걸려도 이벤트가 발생은 되지만 console에 경고가 뜬다.
+```js
+export default {
+
+	emits: {
+		createPost: newTitle => {
+			console.log('validator: ', newTitle);
+			if (!newTitle) { //값이 없다면
+				return false; // 경고창 뜸
+			}
+			return true;
+		},
+	},
+
+	setup(props, { emit }) {
+		const title = ref('');
+		const createPost = () => {
+			emit('createPost', title.value);
+		};
+		return { createPost, title };
+	},
+};
+```
+
+유효성 체크가 없는 경우
+```js
+emits: {
+	createPost: null,
+},
+```
+### v-model
+vue3
+
+
+#### 기본값
+modelvalue라는 props로 값을 입력받아 (vue2: value)
+update:modelValue로 이벤트를 발생시킬 수 있다.(vue2: @input)
+```js
+props:['modelValue'],
+emits:['update:modelValue']
+```
+
+```전달인자```를 사용하면 이름을 수정할 수 있다.
+modelvalue -> title로 이름 변경.
+
+부모 컴포넌트
+```html
+<LabelTitle v-model:title="mainTitle"></LabelTitle>
+```
+
+자식 컴포넌트
+```html
+<input
+	type="text"
+	:value="title"
+	@input="$emit('update:title', $event.target.value)",
+/>
+```
+```js
+import { computed } from 'vue';
+export default {
+	props: ['title'],
+	emits: ['update:title'],
+...
+
+```
+
+### computed
+get, set 으로 읽고 쓰기
+
+부모 컴포넌트
+```html
+<LabelTitle v-model:title="username" label="제~목"></LabelTitle>
+```
+
+자식 컴포넌트
+```html
+<input v-model="value" type="text" />
+```
+```js
+import { computed } from 'vue';
+export default {
+	props: ['title', 'label'],
+	emits: ['update:title'],
+	setup(props, { emit }) {
+		const value = computed({
+			get() {
+				return props.title;
+			},
+			set(value) {
+				emit('update:title', value);
+			},
+		});
+		return { value };
+	},
+};
+```
