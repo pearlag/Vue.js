@@ -1610,7 +1610,7 @@ export default {
 - 싱글 인스턴스 컴포넌트 이름은 (layout, header, sidenav..) 접두사로 The를 붙인다. TheNav, TheHeader, TheFooter..
 
 
-# SFC ✨
+# SFC✨
 template + script + style 세 개의 블록을 갖고 있다.
 
 ### <template>
@@ -1682,7 +1682,7 @@ style태그에 scss를 선언할 수도 있다.
 ```
 
 
-# Props ✨
+# Props✨
 ## 부모---data--->자식 
 > 컴포넌트에 등록할 수 있는 사용자 정의 속성.   
 > 부모 컴포넌트에서 자식 컴포넌트에서 데이터를 전달하는 방법.   
@@ -1853,7 +1853,7 @@ v-bind로 사용해서 전달할 수 있다.(위에서 서술)
 
 #### Boolean Casting
 
-# emit ✨
+# emit✨
 ## 자식---event--->부모
 자식 컴포넌트에서 부모 컴포넌트로 데이터 전달 또는 트리거
 ```emit``` 메서드로 구현 가능하다.
