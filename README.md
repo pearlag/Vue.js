@@ -8,6 +8,18 @@
 3. [Vue란?](#vue란)   
 4. [컴포넌트 이해하기](#컴포넌트-이해하기)   
 5. [Options API vs Composition API](#options-api-vs-composition-api)
+6. [HTML 클래스 바인딩](#HTML-클래스-바인딩)   
+7. [조건부 렌더링](#조건부-렌더링)   
+8. [목록 렌더링](#목록-렌더링)   
+9. [디렉티브](#디렉티브)   
+10. [이벤트 처리](#이벤트-처리)   
+11. [양방향 바인딩](#양방향-바인딩)   
+12. [Watch WatchEffect](#Watch-WatchEffect)  
+13. [컴포넌트 기초](#컴포넌트-기초)  
+14. [SFC](#SFC)  
+15. [Props](#Props-부모---data--->자식)  
+16. [emit](#emit-자식---event--->부모)  
+
 
 # 선수학습✨
 
@@ -1460,7 +1472,7 @@ default는 input 이벤트 후 입력과 데이터를 동기화한다. .lazy 수
 앞뒤 공백 제거.
 
 
-# Watch, WatchEffect✨
+# Watch WatchEffect✨
 
 ### Watch
 반응형 '상태가 변경될 때'마다 '특정 작업'을 수행한다.
@@ -1598,7 +1610,7 @@ export default {
 - 싱글 인스턴스 컴포넌트 이름은 (layout, header, sidenav..) 접두사로 The를 붙인다. TheNav, TheHeader, TheFooter..
 
 
-# SFC (single file component)✨
+# SFC ✨
 template + script + style 세 개의 블록을 갖고 있다.
 
 ### <template>
@@ -1670,7 +1682,7 @@ style태그에 scss를 선언할 수도 있다.
 ```
 
 
-# ```Props```(프롭스)✨ 부모---data--->자식
+# Props 부모---data--->자식 ✨ 
 > 컴포넌트에 등록할 수 있는 사용자 정의 속성.   
 > 부모 컴포넌트에서 자식 컴포넌트에서 데이터를 전달하는 방법.   
 > 외부에서 데이터를 전달받을 수 있다.   
@@ -1840,7 +1852,7 @@ v-bind로 사용해서 전달할 수 있다.(위에서 서술)
 
 #### Boolean Casting
 
-# ```emit``` ✨ 자식 ---event---> 부모
+# emit 자식---event--->부모 ✨
 자식 컴포넌트에서 부모 컴포넌트로 데이터 전달 또는 트리거
 ```emit``` 메서드로 구현 가능하다.
 
