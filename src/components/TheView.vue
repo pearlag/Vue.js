@@ -1,6 +1,10 @@
 <template>
 	<main>
 		<div class="container text-center py-4">
+			<PostCreate @create-post="createPost"></PostCreate>
+
+			<hr class="my-4" />
+
 			<div class="row g-3">
 				<div class="col col-4" v-for="post in posts" key="post.id">
 					<AppCard
@@ -11,16 +15,36 @@
 					></AppCard>
 				</div>
 			</div>
+
+			<hr class="my-4" />
+
+			<LabelInput v-model="username" label="이~름"></LabelInput>
+			<LabelTitle v-model:title="username" label="제~목"></LabelTitle>
+
+			<hr class="my-4" />
+
+			<Username
+				v-model:firstname="firstname"
+				v-model:lastname="lastname"
+			></Username>
 		</div>
 	</main>
 </template>
 
 <script>
 import AppCard from '@/components/AppCard.vue';
-import { reactive } from 'vue';
+import PostCreate from '@/components/PostCreate.vue';
+import LabelInput from '@/components/LabelInput.vue';
+import LabelTitle from '@/components/LabelTitle.vue';
+import Username from '@/components/Username.vue';
+import { ref, reactive } from 'vue';
 export default {
 	components: {
 		AppCard,
+		PostCreate,
+		LabelInput,
+		LabelTitle,
+		Username,
 	},
 	setup() {
 		const posts = reactive([
@@ -48,7 +72,16 @@ export default {
 				type: 'notice',
 			},
 		]);
-		return { posts };
+		const createPost = newPost => {
+			console.log('createPost');
+			console.log('newPost: ', newPost);
+			posts.push(newPost);
+		};
+
+		const username = ref('');
+		const firstname = ref('');
+		const lastname = ref('');
+		return { posts, createPost, username, firstname, lastname };
 	},
 };
 </script>
