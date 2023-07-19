@@ -2018,3 +2018,139 @@ export default {
 	},
 };
 ```
+
+
+# Non-Prop 속성(fallthrough 속성)
+props와 emit에 명시적으로 선언하지 않는 속성, 또는 이벤트.
+이 속성은 루트 요소의 속성에 자동으로 추가된다.
+
+부모 컴포넌트
+```html
+<LabelInput
+	v-model="username"
+	label="이~름"
+	class="non-class"
+	style="color: red"
+	id="아이디"
+	data-id="data"
+	hello="kkk"
+></LabelInput>
+```
+자식 컴포넌트
+```html
+<template>
+	<label>
+		{{ label }}
+		<input v-model="value" type="text" />
+	</label>
+</template>
+```
+
+최종 렌더링된 DOM
+```html
+<label 
+	class="non-class" 
+	id="아이디" 
+	data-id="data" 
+	hello="kkk" 
+	style="color: red;"
+>이~름
+	<input type="text" />
+</label>
+```
+
+### class, style
+이 두 속성은 조금 다르게 상속한다. 병합된다.
+
+만약 자식 컴포넌트 루트요소에 이미 속성이 정의되어 있다면,
+class와 style는 병합된다.
+id는 부모로부터 받은 것만 덮어씌워진다.
+부모 컴포넌트
+```html
+<LabelInput
+	v-model="username"
+	label="이~름"
+	class="parent-class"
+	style="color: red"
+	id="parent-id"
+></LabelInput>
+```
+자식 컴포넌트
+```html
+<template>
+	<label 
+		class="child-class" 
+		style="border: 1px solid #000" 
+		id="child-id">
+		{{ label }}
+		<input v-model="value" type="text" />
+	</label>
+</template>
+```
+
+최종 렌더링된 DOM
+```html
+<label 
+	class="child-class parent-class" 
+	id="parent-id" 
+	style="color: red; border: 1px solid rgb(0, 0, 0);"
+>이~름
+	<input type="text" />
+</label>
+```
+
+### v-on 이벤트 리스너 상속
+부모 컴포넌트에서 선언된 자식 컴포넌트 템플릿에 v-on 이벤트를 걸면 잘 작동된다.
+이는, non-props 속성은 자식컴포넌트의 루트 엘리먼트에 상속되기 때문이다.
+
+### 속성 상속 비활성화
+inheritAttrs: false
+컴포넌트 내에서 depth가 추가되면 루트 엘리먼트가 변할수도 있다.
+비활성화할 컴포넌트 내에서 선언하면 된다.
+
+#### non-props 속성 핸들링 하는 방법
+> 속성 상속을 비활성화했을 때, 자식 컴포넌트 내부에 이벤트를 걸고 싶으면 ```$attrs``` 객체를 사용하여 v-bind바인딩하면 된다.   
+> 중간에 하이픈이 들어간 속성은 대괄호로 감싸준다. ```$attrs['foo-bar']```   
+>```@click```과 같은 ```v-on``` 리스너는 ```$attrs.onClick```로 접근한다.
+
+
+자식 컴포넌트
+```html
+<button class="btn btn-primary" type="button" v-bind="$attrs"></button>
+```
+속성에 접근하려면
+```js
+export default {
+	inheritAttrs: false, // 속성 상속 비활성화상태
+	setup(props, context) {
+		console.log('context.attrs:', context.attrs);
+		console.log('class:', context.attrs.class);
+		console.log('id:', context.attrs.id);
+		console.log('onClick:', context.attrs.onClick);
+		return {};
+	},
+};
+```
+
+### Fragments (vue3)
+다중 루트 노드 컴포넌트
+> <template> 바로 아래에 여러 개의 자식을 넣을 수 있다. 
+자유롭게 마크업해도 가능하다.   
+> 그래서, 만약 컴포넌트가 다중 루트일 때, non-props를 쓸때 어디에 상속할지! 명시적으로! v-bind="$attrs"로 지정해야한다.
+> 또는 자식 컴포넌트에서 이벤트를 발생시켜 emit으로 올릴 때는, emits:[""] 옵션을 꼭 선언해야 한다.
+
+부모 컴포넌트
+```html
+<LabelInput label="이름" data-id="이름"></LabelInput>
+```
+
+자식 컴포넌트
+```html
+<template>
+	<label class="form-label" id="child-id">
+		{{ label }}
+	</label>
+	<input v-model="value" v-bind="$attrs" type="text" class="form-control" />
+</template>
+```
+---> data-id="이름"은 input에 상속된다.
