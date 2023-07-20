@@ -2154,3 +2154,146 @@ export default {
 </template>
 ```
 ---> data-id="이름"은 input에 상속된다.
+
+
+# Slots
+컴포넌트에 컨텐츠를 전달하는 방법.
+
+자식 컴포넌트 FancyButton.vue
+```vue
+<template>
+	<button class="fancy-btn">
+		<slot></slot>
+	</button>
+</template>
+```
+
+부모 컴포넌트
+```vue
+<FancyButton>
+ // 콘텐츠 삽입하면 자식 컴포넌트의 slot에 그대로 전달됨.
+</FancyButton>
+```
+
+### fallback Content
+부모 컴포넌트에서 슬롯 콘텐츠가 제공되지 않을 때, slot에 대한 fallback(기본 콘텐츠)을 지정할 수 있습니다.
+
+자식 컴포넌트 FancyButton.vue
+```vue
+<template>
+	<button class="fancy-btn">
+		<slot>Default</slot>
+	</button>
+</template>
+```
+
+### Named Slots
+slot 요소에 name 속성을 부여하여 여러 개의 slot을 정의할 수 있다.
+특정 슬롯 콘텐츠가 렌더링 되어야 할 위치를 설정할 수 있다.
+name이 없는 slot의 name은 default이다.
+
+자식 컴포넌트 FancyButton.vue
+```vue
+<template>
+	<div class="card">
+		<div class="card-header">
+			<slot name="header">#header</slot>
+		</div>
+		<div class="card-body">
+			<slot>#body</slot>
+		</div>
+		<div class="card-footer text-muted">
+			<slot name="footer">#footer</slot>
+		</div>
+	</div>
+</template>
+```
+
+부모 컴포넌트 
+```html
+<AppCard>
+	<template #header>제목</template>
+	이 부분은 암시적으로 default 슬롯으로 출력
+	<template #footer>푸터..</template>
+</AppCard>
+```
+> ```v-slot``` / 단축속성: ```#```   
+> 그냥 생으로 적으면 암시적으로 default 슬롯으로 출력됨.  
+
+### 동적으로 변경도 가능하다.
+
+부모 컴포넌트
+```html
+<template #[slotArgs]>제목</template>
+...
+const slotArgs = ref('header');
+```
+이렇게 넣으면 동적으로 변경도 가능하다.
+값을 default로 넣으면 body 부분에 바인딩되고,
+footer로 넣으면 footer 부분에 바인딩된다.
+
+### Render Scope
+Named Slots이 된다고 해서 부모 컴포넌트에서 자식 컴포넌트의 데이터에 접근할 수는 없다.
+
+슬롯 콘텐츠는 상위 컴포넌트에서 컴파일이 된다.
+그렇기 때문에 상위 컴포넌트의 데이터는 참조가 가능하다.
+
+---> 해결하는 방법은 바로바로
+
+### Scoped Slots
+자식 컴포넌트의 데이터를 상위 컴포넌트 안에서 사용하는 방법!
+props를 전달하는 것처럼! 하면 됨
+
+
+#### 데이터 받기
+> default로 받을 때는 #default, v-slot="{}", 또는 #="{}"으로 받을 수 있다.
+> named로 받을 때는 #named="{}"
+자식 컴포넌트
+```html
+<slot :fancy-message="fancyMessage"></slot>
+<slot name="header" :fancy-message="fancyMessage"></slot>
+```
+
+부모 컴포넌트
+```html
+// default
+<FancyButton v-slot="{fancyMessage}"></FancyButton>
+
+//단축 속성 - default
+<FancyButton #="{fancyMessage}"></FancyButton>
+//단축 속성 - named
+<FancyButton #header="{fancyMessage}"></FancyButton>
+
+///template을 껴서 받을 경우
+<FancyButton>
+	<template #="{ fancyMessage }">{{ fancyMessage }}</template>
+	<template #header="{ fancyMessage }">{{ fancyMessage }}</template>
+</FancyButton>
+
+
+```
+
+### 예시
+AppCard.vue에서는 헤더, 바디, 푸터가 정의되어 있다.
+그러나 바디 부분만 쓰고 싶다.
+
+AppCard.vue에서 헤더와 푸터의 contents가 없음에도 불구하고 박스는 그대로 ui에 출력된다.
+이 공백 박스를 없애기 위해서는 슬롯 내장 객체를 사용할 수 있다.
+
+그럴 땐 AppCard.vue에서 조건에 따라 렌더링할 박스에 v-if="$slots.footer" 를 넣어주면 된다.
+
+또는 computed로 구현할 수도 있다.
+
+AppCard.vue
+```html
+<div v-if="hasFooter" class="card-footer text-muted">
+	<slot name="footer" footer-message="자식푸터메시지"></slot>
+</div>
+
+...
+setup(props, { slots }) {
+	const hasFooter = computed(() => slots.footer);
+	return { hasFooter };
+},
+
+```
