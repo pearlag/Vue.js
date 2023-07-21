@@ -2453,6 +2453,7 @@ setup함수 안에서 inject()로 주입 가능하다.
 
 
 # Lifecycle Hooks
+각 단계에서 프로그래밍 코드를 수행할 수 있는 함수들을 말한다.
 Creation(생성) - Mounting(장착) - Updating(변경) - Destruction(소멸)
 
 Options API, ComPosition API 둘다 지원
@@ -2462,6 +2463,71 @@ Options API, ComPosition API 둘다 지원
 > 가장 먼저 실행된다.   
 > 아직 컴포넌트가  DOM에 추가되기 전이라, DOM에 접근할 수 없다.   
 #### beforeCreate
+컴포넌트가 초기화될 때 실행되는 훅.
+컴포넌트 인스턴스에 접근 가능하다.this
+data()가 처리되기 전이라 data()에는 접근할 수 없다.
 
 #### created
+data() 처리 이후라, data() 접근 가능하다.
+
 #### setup
+beforeCreate, created는 vue3에서는 setup()에서 사용함.
+
+
+### Mounting
+DOM에 컴포넌트를 삽입하는 단계다.
+
+#### onBeforeMount
+컴포넌트가 마운트되기 직전에 호출됨.
+
+#### onMounted
+컴포넌트가 마운트된 후에 호출됨.
+DOM에 접근할 수 있다.
+모든 자식의 컴포넌트가 마운트되었다는 뜻.
+```
+<input ref="inputRef" type="text" value="hello" />
+...
+
+onMounted(() => {
+	console.log('onMounted', inputRef.value.value);
+});
+
+// hello 출력
+
+```
+
+#### 부모 자식 간의 lifecycle
+```bash
+setup
+onBeforeMount
+[Child] setup
+[Child] onBeforeMount
+[Child] onMounted
+onMounted 
+```
+
+### Updating
+컴포넌트에서 사용하는 반응형 데이터가 변경되거나, 재렌더링이 발생될 때 호출된다.
+
+#### onBeforeUpdate
+반응형 상태 변경으로 인해 컴포넌트가 DOM 트리를 업데이트하기 직전에 호출된다.
+
+#### onUpdated
+DOM트리를 업데이트 한 후에 호출된다.
+
+```bash
+onBeforeUpdate Hello World1
+DOM content:   // DOM이 업데이트 되기 전이라 빈값임
+onUpdated Hello World1
+DOM content:  Hello World1
+```
+
+# Destruction
+소멸 단계.
+
+### onBeforeUnmount
+컴포넌트가 마운트 해제되기 직전에 호출된다.
+DOM을 가져올 수 있다.
+
+### onUnmounted
+컴포넌트가 마운트 해제된 후 호출된다.
