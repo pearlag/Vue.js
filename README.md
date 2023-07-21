@@ -2238,12 +2238,51 @@ Named Slots이 된다고 해서 부모 컴포넌트에서 자식 컴포넌트의
 슬롯 콘텐츠는 상위 컴포넌트에서 컴파일이 된다.
 그렇기 때문에 상위 컴포넌트의 데이터는 참조가 가능하다.
 
----> 해결하는 방법은 바로바로
+해결하는 방법은 바로바로~~~
 
 ### Scoped Slots
 자식 컴포넌트의 데이터를 상위 컴포넌트 안에서 사용하는 방법!
 props를 전달하는 것처럼! 하면 됨
 
+자식 컴포넌트
+> 디폴트 슬롯이다.   
+> 데이터를 출력할 slot에 값을 바인딩해준다.
+```html
+<slot :child-message="childMessage">#Body</slot>
+
+// 값이 더 있을 경우 
+<slot :child-message="childMessage" hello-message="안녕!">#Body</slot>
+
+...
+const childMessage = ref('자식 메시지')
+```
+
+
+부모 컴포넌트
+```html
+// 방법 1. 오브제로 받기
+<AppCard>
+	<template #default="obj">
+		{{ obj }}
+	</template>
+</AppCard>
+
+// 방법 2. 객체로 받기
+<AppCard>
+	<template #default="slotProps">
+		{{ slotProps.childMessage }}
+	</template>
+</AppCard>
+
+// 방법 3. 객체를 구조분해할당으로 받기.
+<AppCard>
+	<template #default="{childMessage}">
+	<!-- 값이 더 있을 경우-->
+	<template #default="{childMessage, helloMessage}">
+		{{ childMessage }}
+	</template>
+</AppCard>
+```
 
 #### 데이터 받기
 > default로 받을 때는 #default, v-slot="{}", 또는 #="{}"으로 받을 수 있다.
@@ -2278,11 +2317,11 @@ AppCard.vue에서는 헤더, 바디, 푸터가 정의되어 있다.
 그러나 바디 부분만 쓰고 싶다.
 
 AppCard.vue에서 헤더와 푸터의 contents가 없음에도 불구하고 박스는 그대로 ui에 출력된다.
-이 공백 박스를 없애기 위해서는 슬롯 내장 객체를 사용할 수 있다.
+이 공백 박스를 없애기 위해서는 ```슬롯 내장 객체```를 사용할 수 있다.
 
-그럴 땐 AppCard.vue에서 조건에 따라 렌더링할 박스에 v-if="$slots.footer" 를 넣어주면 된다.
+그럴 땐 AppCard.vue에서 조건에 따라 렌더링할 박스에 ```v-if="$slots.footer"``` 를 넣어주면 된다.
 
-또는 computed로 구현할 수도 있다.
+또는```computed```로 구현할 수도 있다.
 
 AppCard.vue
 ```html
@@ -2291,9 +2330,138 @@ AppCard.vue
 </div>
 
 ...
-setup(props, { slots }) {
+setup(props, { slots }) {   
 	const hasFooter = computed(() => slots.footer);
 	return { hasFooter };
 },
 
 ```
+
+# Provide / Inject
+부모 -> 자식 Props로 데이터 전달.
+만약 , 전달하는 데이터의 depth가 깊다면?
+Prop Drilling의 문제를 해결하는게 Provide/ Inject.
+계층 구조의 깊이에 상관없이, 모든 자식 컴포넌트에게 데이터를 전달할 수 있다.
+
+# Provide()
+부모(provide 함수 사용) ------> 자식(손자일수도, 증손자일수도..)
+
+부모 컴포넌트
+```js
+setup(){
+	provide(주입 키, 주입할 값)
+},
+	...
+```
+> 첫 번째 파라미터 : 주입 키 : 문자열, symbol   
+> 두 번째 파라미터 : 주입할 값 : ref를 포함한 모든 유형   
+
+> 반응형 데이터도 넣을 수 있다. (리턴해야함)
+```html
+<template>
+	<div class="container py-4">
+		<div class="card">
+			<div class="card-header">ProvideInject Component</div>
+			<div class="card-body">
+				<button @click="count++">click</button>
+				<Child></Child>
+			</div>
+		</div>
+	</div>
+</template>
+```
+```js
+setup() {
+	const staticMessage = 'static message';
+	const message = ref('');
+	const count = ref(10);
+	//provide('static-message', staticMessage);
+	provide('message', message);
+	provide('count', count);
+	return { 
+		count 
+	};
+},
+```
+
+# Inject()
+데이터를 받을 (종속된)컴포넌트에서 inject 선언한다.
+```html
+<template>
+	<div class="card">
+		<div class="card-header">Deep Child Component</div>
+		<div class="card-body">
+			<p>{{ staticMessage }}</p>
+			<p>{{ message }}</p>
+			<p>{{ count }}</p>
+		</div>
+	</div>
+</template>
+```
+```js
+setup() {
+	const staticMessage = inject('static-message', 'default message');
+	const message = inject('message');
+	const count = inject('count');
+	return { 
+		staticMessage, 
+		message, 
+		count 
+	};
+},
+```
+
+### Reactivity
+Provide/Inject 반응성 데이터로 제공할 때,
+모든 변경을 Provider 내부에서 한다. 유지관리 용이하다.
+
+### readonly()
+연결된 하위 컴포넌트에서 제공된 값을 변경할 수 없다.
+
+### Symbol 키 사용
+대규모 프로젝트에서 충돌을 피하기 위해 Symbol 주입 키 사용
+
+### App 레벨 데이터 제공
+모든 컴포넌트에서 사용 가능
+
+main.js
+```js
+...
+app.provide('app-message', 'app message 입니다');
+app.config.globalProperties.msg = 'hello'; // vue2에서는 이렇게 사용.
+```
+
+component.vue
+```html
+<p>{{ appMessage }}</p>
+...
+import {inject } from 'vue';
+const appMessage = inject('app-message');
+
+// vue2에서 불러올 때.
+mounted() {
+		console.log(this.msg);
+	},
+```
+globalProperties는 vue2에서 사용했다.
+데이터를 불러올 때, mounted()는 컴포넌트 인스턴스가 생성된 후라서 this로 접근 가능하다.
+그러나 vue3 composition API setup()에서는 컴포넌트 인스턴스 생성 전이라 this 접근이 불가능하다.
+
+그래서 vue3에서는 app.provide()를 사용한다.
+setup함수 안에서 inject()로 주입 가능하다.
+
+
+
+# Lifecycle Hooks
+Creation(생성) - Mounting(장착) - Updating(변경) - Destruction(소멸)
+
+Options API, ComPosition API 둘다 지원
+
+### Creation
+> 컴포넌트 초기화 단계.   
+> 가장 먼저 실행된다.   
+> 아직 컴포넌트가  DOM에 추가되기 전이라, DOM에 접근할 수 없다.   
+#### beforeCreate
+
+#### created
+#### setup
