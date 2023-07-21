@@ -2531,3 +2531,54 @@ DOM을 가져올 수 있다.
 
 ### onUnmounted
 컴포넌트가 마운트 해제된 후 호출된다.
+
+
+# Template refs (템플릿 참조)
+
+
+### 마운트된 Dom 요소 , 자식 컴포넌트에 대한 참조를 얻을 수 있다.
+
+> input은 마운트가 완료될 때까지 null이다. 마운트가 완료된 후에 참조값이 할당된다. 그래서 v-if 사용함.   
+> 
+```vue
+<template>
+	<div class="container py-4">
+		<input ref="input" type="text" />
+		<!-- ref에 이름을 정해준다! -->
+
+		<p>{{ input }}</p>
+		<!-- "[object HTMLInputElement]" 출력-->
+
+		<p v-if="input">
+			{{ input.value }}, {{ $refs.input.value }}, {{ $refs.input === input }}
+			<!--hello, hello, true 출력-->
+		</p>
+
+	</div>
+</template>
+<script>
+import { ref, onMounted } from 'vue';
+setup() {
+	const input = ref(null); // 위에 선언한 ref 값과 동일한 함수명 선언
+	console.log('setup: ', input.value); // null
+
+	onMounted(() => {
+		input.value.value = 'hello';
+		console.log('onMounted: ', input.value.value); 
+		// <input type="text">
+	});
+
+	return { input };
+	},
+};
+</script>
+```
+
+### v-for 내부 참조
+vue v3.2.25 이상에서 작동합니다.
+
+v-for 선언한 태그에 ref 속성으로 참조하면 된다.
+<ul>
+	<li v-for="fruit in fruits" :key="fruit" ref="ltemRefs">{{ fruit }}</li>
+</ul>
+
