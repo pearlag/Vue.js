@@ -3,22 +3,17 @@ require('@rushstack/eslint-patch/modern-module-resolution');
 
 module.exports = {
 	root: true,
-	parserOptions: {
-		ecmaVersion: '2023',
-		sourceType: 'module',
-	},
 	extends: [
 		'plugin:vue/vue3-essential',
 		'eslint:recommended',
-		'@vue/eslint-config-prettier/skip-formatting',
+		'@vue/eslint-config-prettier',
 	],
 	env: {
 		'vue/setup-compiler-macros': true,
 	},
-	parserOptions: {
-		ecmaVersion: 'latest',
-	},
 	rules: {
+		'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+		'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
 		'prettier/prettier': [
 			'error',
 			{
@@ -30,6 +25,7 @@ module.exports = {
 				printWidth: 80,
 				bracketSpacing: true,
 				arrowParens: 'avoid',
+				endOfLine: 'auto', // 한줄 추가
 			},
 		],
 	},
