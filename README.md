@@ -2027,7 +2027,7 @@ export default {
 ```
 
 
-# Non-Prop 속성
+# Non-Prop 속성✨
 = fallthrough 속성
 props와 emit에 명시적으로 선언하지 않는 속성, 또는 이벤트.
 이 속성은 루트 요소의 속성에 자동으로 추가된다.
@@ -2147,7 +2147,7 @@ export default {
 > 그래서, 만약 컴포넌트가 다중 루트일 때, non-props를 쓸때 어디에 상속할지! 명시적으로! v-bind="$attrs"로 지정해야 한다.   
 > 또는 자식 컴포넌트에서 이벤트를 발생시켜 emit으로 올릴 때는, emits:[""] 옵션을 꼭 선언해야 한다.   
 
---
+-
 부모 컴포넌트
 ```html
 <LabelInput label="이름" data-id="이름"></LabelInput>
@@ -2162,10 +2162,10 @@ export default {
 	<input v-model="value" v-bind="$attrs" type="text" class="form-control" />
 </template>
 ```
----> data-id="이름"은 input에 상속된다.
----
+  data-id="이름"은 input에 상속된다.
 
-# Slots
+
+# Slots✨
 컴포넌트에 컨텐츠를 전달하는 방법.
 
 자식 컴포넌트 FancyButton.vue
@@ -2346,13 +2346,13 @@ setup(props, { slots }) {
 
 ```
 
-# Provide / Inject
+# Provide / Inject✨
 부모 -> 자식 Props로 데이터 전달.
 만약 , 전달하는 데이터의 depth가 깊다면?
 Prop Drilling의 문제를 해결하는게 Provide/ Inject.
 계층 구조의 깊이에 상관없이, 모든 자식 컴포넌트에게 데이터를 전달할 수 있다.
 
-# Provide()
+# Provide() ✨
 부모(provide 함수 사용) ------> 자식(손자일수도, 증손자일수도..)
 
 부모 컴포넌트
@@ -2393,7 +2393,7 @@ setup() {
 },
 ```
 
-# Inject()
+# Inject()  ✨
 데이터를 받을 (종속된)컴포넌트에서 inject 선언한다.
 ```html
 <template>
@@ -2461,7 +2461,7 @@ setup함수 안에서 inject()로 주입 가능하다.
 
 
 
-# Lifecycle Hooks
+# Lifecycle Hooks ✨
 각 단계에서 프로그래밍 코드를 수행할 수 있는 함수들을 말한다.
 Creation(생성) - Mounting(장착) - Updating(변경) - Destruction(소멸)
 
@@ -2542,7 +2542,7 @@ DOM을 가져올 수 있다.
 컴포넌트가 마운트 해제된 후 호출된다.
 
 
-# Template refs
+# Template refs ✨
 템플릿 참조
 
 ### 마운트된 Dom 요소 , 자식 컴포넌트에 대한 참조를 얻을 수 있다.
@@ -2624,7 +2624,7 @@ const child = ref(null);
 ```
 
 
-# script setup
+# script setup ✨
 ```<script setup>``` 을 쓰면
 ```
 export default{
@@ -2689,7 +2689,7 @@ env: {
 		'vue/setup-compiler-macros': true,
 	},
 
-# 동적 컴포넌트
+# 동적 컴포넌트 ✨
 탭을 눌렀을 때 아래 콘텐츠가 바뀌게 하는 것처럼, 컴포넌트를 동적으로 변경하고 싶을 때
 ```v-bind:is```
 ```
