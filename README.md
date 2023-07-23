@@ -2142,11 +2142,12 @@ export default {
 
 ### Fragments (vue3)
 다중 루트 노드 컴포넌트
-> <template> 바로 아래에 여러 개의 자식을 넣을 수 있다. 
-자유롭게 마크업해도 가능하다.   
-> 그래서, 만약 컴포넌트가 다중 루트일 때, non-props를 쓸때 어디에 상속할지! 명시적으로! v-bind="$attrs"로 지정해야한다.
+> template 태그 바로 아래에 여러 개의 자식을 넣을 수 있다.   
+> 자유롭게 마크업해도 가능하다.   
+> 그래서, 만약 컴포넌트가 다중 루트일 때, non-props를 쓸때 어디에 상속할지! 명시적으로! v-bind="$attrs"로 지정해야 한다.   
 > 또는 자식 컴포넌트에서 이벤트를 발생시켜 emit으로 올릴 때는, emits:[""] 옵션을 꼭 선언해야 한다.   
 
+--
 부모 컴포넌트
 ```html
 <LabelInput label="이름" data-id="이름"></LabelInput>
@@ -2162,7 +2163,7 @@ export default {
 </template>
 ```
 ---> data-id="이름"은 input에 상속된다.
-
+---
 
 # Slots
 컴포넌트에 컨텐츠를 전달하는 방법.
