@@ -19,6 +19,13 @@
 14. [SFC](#SFC)  
 15. [Props](#Props)  
 16. [emit](#emit)  
+17. [Non-Prop 속성](#Non-Prop-속성)  
+18. [Provide()](#Provide())  
+19. [Inject()](#Inject())  
+20. [Lifecycle Hooks](#Lifecycle-Hooks)  
+21. [Template refs](#Template-refs)  
+22. [script setup](#script-setup)  
+23. [동적 컴포넌트](#동적-컴포넌트)  
 
 
 # 선수학습✨
@@ -2020,7 +2027,8 @@ export default {
 ```
 
 
-# Non-Prop 속성(fallthrough 속성)
+# Non-Prop 속성
+= fallthrough 속성
 props와 emit에 명시적으로 선언하지 않는 속성, 또는 이벤트.
 이 속성은 루트 요소의 속성에 자동으로 추가된다.
 
@@ -2522,19 +2530,19 @@ onUpdated Hello World1
 DOM content:  Hello World1
 ```
 
-# Destruction
+### Destruction
 소멸 단계.
 
-### onBeforeUnmount
+#### onBeforeUnmount
 컴포넌트가 마운트 해제되기 직전에 호출된다.
 DOM을 가져올 수 있다.
 
-### onUnmounted
+#### onUnmounted
 컴포넌트가 마운트 해제된 후 호출된다.
 
 
-# Template refs (템플릿 참조)
-
+# Template refs
+템플릿 참조
 
 ### 마운트된 Dom 요소 , 자식 컴포넌트에 대한 참조를 얻을 수 있다.
 
@@ -2574,11 +2582,147 @@ setup() {
 </script>
 ```
 
-### v-for 내부 참조
+### ```v-for``` 내부 참조
 vue v3.2.25 이상에서 작동합니다.
 
 v-for 선언한 태그에 ref 속성으로 참조하면 된다.
+```
 <ul>
 	<li v-for="fruit in fruits" :key="fruit" ref="ltemRefs">{{ fruit }}</li>
 </ul>
 
+```
+
+###  컴포넌트 Refs
+> 자식 컴포넌트의 모든 속성과 메서드에 대한 전체를 접근할 수 있다.   
+> but, 부모/자식 컴포넌트간 의존도가 생기기 때문에 반드시 필요한 경우에만 사용한다.   
+> 일반적으로 props를 사용한다.
+부모 컴포넌트
+```
+<TemplateRefsChild ref="child"></TemplateRefsChild>
+...
+onMounted(() => {
+	console.log('child.message', child.value.message);
+	child.value.sayHello();
+});
+const child = ref(null);
+```
+
+### ```$parent``` 객체
+자식 ->부모 접근
+자식 컴포넌트
+```
+<template>
+	<div>
+		{{ $parent }}
+		<ul>
+			<li v-for="fruit in $parent.fruits" :key="fruit">{{ fruit }}</li>
+		</ul>
+	</div>
+</template>
+```
+
+
+# script setup
+```<script setup>``` 을 쓰면
+```
+export default{
+	setup(){
+		return{};
+	},
+};
+```
+를 생략할 수 있게 된다.
+컴포넌트 정의도, 리턴도, 필요없다.
+
+## setup()에서 접근할수있는 객체를 setup() 없이 어떻게 사용하냐?
+
+### script setup 안에서 props와 emits 사용
+
+```defineProps```
+```defineEmits```
+
+script setup 안에서 쓰는 컴파일러 매크로. 임폴트x
+
+### defineExpose()
+> script setup을 사용하는 컴포넌트는 기본적으로 Template Refs나 $parent와 같이 컴포넌트간 통신이 닫혀있다.   
+> 내부 데이터, 메서드 명시적 노출 defineExpose()
+
+자식에서 노출할 데이터를 정의.
+
+### useSlots, useAttrs
+
+```
+import { useSlots, useAttrs } from 'vue'
+const slots = useSlots()
+const attrs = useAttrs()
+```
+
+### 한 번만 실행되어야 하는 로직이 있을 때, script와 script setup을 함께 사용한다. 
+(plugin 등등)
+> 동일한 컴포넌트를 여러 번 사용할 경우, 각각의 컴포넌트 인스턴스가 생성(A)된다. script setup은 A의 갯수만큼 생성된다.   
+> 이런 상황에서 script를 한 번만 실행할 때 사용한다.   
+```js
+<script>
+export default {
+	inheritAttrs: false,
+};
+</script>
+<script setup>
+import { ref } from 'vue';
+const message = ref('message');
+</script>
+```
+
+### Top-level ```await```
+top level에서 await 사용 가능.
+async setup()
+우선, json data를 위해서 통신모듈을 설치한다.
+npm i axios
+
+dummy sample API
+	https://dummy.restapiexample.com/api/v1/employees
+
+eslinttrc.cjs에 추가(경고표시 해제)
+env: {
+		'vue/setup-compiler-macros': true,
+	},
+
+# 동적 컴포넌트
+탭을 눌렀을 때 아래 콘텐츠가 바뀌게 하는 것처럼, 컴포넌트를 동적으로 변경하고 싶을 때
+```v-bind:is```
+```
+<component :is="동적으로 넣을 컴포넌트명"></component>
+```
+```ref```함수로 정의하느것보다 ```shallowRef``` 함수로 정의하는게 퍼포먼스적으로 유리하다.
+> 속성에 대해선 반응하지 않고, 값이 바꼈을때만 반응한다. ex) name의 값이 바뀌었을때 말고  object -> string으로 바뀌었을때만 반응한다.
+```
+<template>
+	<div class="container py-4">
+		<button
+			class="btn btn-primary me-2"
+			@click="changeCurrentComp(DynamicApple)"
+		>
+			사과
+		</button>
+		<button class="btn btn-danger" @click="changeCurrentComp(DynamicBanana)">
+			바나나
+		</button>
+		<hr />
+		<component :is="currentComp"></component>
+		<p>{{ obj1 }}</p>
+		<p>{{ obj2 }}</p>
+	</div>
+</template>
+
+<script setup>
+import { ref, shallowRef } from 'vue';
+import DynamicApple from './DynamicApple.vue';
+import DynamicBanana from './DynamicBanana.vue';
+
+const currentComp = shallowRef(DynamicApple);
+const obj1 = ref({ name: '주으니' });
+const obj2 = shallowRef({ name: '냐하' });
+const changeCurrentComp = comp => (currentComp.value = comp);
+</script>
+```
