@@ -17,29 +17,41 @@
 				<div class="collapse navbar-collapse" id="navbarSupportedContent">
 					<ul class="navbar-nav me-auto">
 						<li class="nav-item">
-							<a class="nav-link active" aria-current="page" href="#">Home</a>
+							<router-link class="nav-link" active-class="active" to="/"
+								>Home</router-link
+							>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link" href="#">about</a>
+							<router-link class="nav-link" active-class="active" to="/about"
+								>About</router-link
+							>
+						</li>
+						<li class="nav-item">
+							<router-link class="nav-link" active-class="active" to="/posts"
+								>게시글</router-link
+							>
 						</li>
 					</ul>
-					<form class="d-flex" role="search">
-						<input
-							class="form-control me-2"
-							type="search"
-							placeholder="Search"
-							aria-label="Search"
-						/>
-						<button class="btn btn-outline-success" type="submit">
-							Search
+					<div class="d-flex" role="search">
+						<button class="btn btn-outline-light" type="button" @click="goPage">
+							글쓰기
 						</button>
-					</form>
+					</div>
 				</div>
 			</div>
 		</nav>
 	</header>
 </template>
 
-<script setup></script>
+<script setup>
+import { useRouter } from 'vue-router';
 
-<style lang="scss" scoped></style>
+const router = useRouter();
+const goPage = () => {
+	router.push({
+		name: 'PostCreate',
+	});
+};
+</script>
+
+<style scoped></style>
