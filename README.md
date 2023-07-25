@@ -232,3 +232,82 @@ router.push({
 ```
 
 # 404 page Component
+엉뚱한 url로 이동했을 때 이동할 페이지를 설정한다.
+index.js
+```js
+const routes = [
+	{
+		path: '/:pathMatch(.*)*',
+	// path: '/user-:afterUser(.*)', 특정 문자열 뒤에 정규식 표현할 때
+		name: 'NotFound',
+		component: NotFoundView,
+	},
+];
+```
+
+### 중첩된 라우트
+> nav에서 선택된 메뉴의 컨텐츠가 이미 보여지고 있는데   
+> 그 컨텐츠에 또 탭이 있어서 그 탭에 해당되는 컨텐츠가 보여져야할 때.  
+
+1. 부모 컴포넌트에 ```<router-view></router-view>```를 넣는다.
+
+2. 라우트 설정에서 부모 컴포넌트 안에 children 속성을 넣어, 딸린 페이지들을 연결한다.
+```js
+{
+	path: '/Nested',
+	name: 'Nested',
+	component: NestedView,
+	children: [
+		{
+				path: '', // /Neseted 페이지, 즉 기본 페이지
+				name: 'NestedHome',
+				component: NestedHomeView,
+			},
+		{
+			path: 'one',
+			name: 'NestedOne',
+			component: NestedOneView,
+		},
+		{
+			path: 'two',
+			name: 'NestedTwo',
+			component: NestedTwoView,
+		},
+	],
+},
+```
+
+### router.replace
+= router.push
+
+> 현재 페이지 컴포넌트를 '대체'한다.   
+> 히스토리에 쌓이지 않는다.   
+> 예를 들면, 페이지 이동을 about -> nested -> nested/one 페이지로 이동했다고 하자.   
+> nested에 딸린 페이지 one, two는 link를 router.replace로 처리하였다.   
+> 이 때, one과 two 페이지는 nested 페이지를 대체한다.   
+> 그래서 one(또는 two, three four..) 페이지에서 뒤로 가기를 누르면 about 페이지가 나온다.   
+```html
+// replace 사용 안함
+<router-link to="/nested/one">Nested One</router-link>
+
+//replace 사용
+<router-link :to="{ name: 'NestedOne', replace: true }">Nested One</router-link>
+```
+
+
+
+# 페이지 컴포넌트에 Props 전달
+
+1. id값을 여기저기 보낼 경우,
+(보낼 id가 있는 컴포넌트의)라우터에서 props:true
+
+객체 모드로 넘길수도 있음.
+
+함수 모드로 넘기기.
+props: (route) => {
+	return {
+		id : parseInt(route.params.id),
+		other: route.query
+	}
+}
+매개변수로 route 넘기고,.. 
