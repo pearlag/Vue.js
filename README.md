@@ -298,16 +298,164 @@ const routes = [
 
 # 페이지 컴포넌트에 Props 전달
 
-1. id값을 여기저기 보낼 경우,
-(보낼 id가 있는 컴포넌트의)라우터에서 props:true
+0. api 데이터 내보내기
+```js
+export function getPostById(id) {
+	const numberID = parseInt(id); // string -> number 변환
+	return posts.find(item => item.id === id);
+}
+```
 
-객체 모드로 넘길수도 있음.
+1. 데이터를 가져올 컴포넌트
+```js
+import { getPostById } from '@/api/posts';
+..
+const id = route.params.id;
+const form = ref({});
 
-함수 모드로 넘기기.
+const fetchPost = () => {
+	const data = getPostById(id);
+	form.value = { ...data };
+};
+```
+
+
+
+### reactive()와 ref() 의 차이
+
+#### ref() 레퍼런스,프리미티브 모두 할당 가능.
+장점
+- 한꺼번에 객체 할당 가능 + 반응형 살아있음
+form.value = {...data}
+- 일관성 유지
+
+단점
+- .value를 계속 붙여야 한다.
+form.value.title, form.value.content
+
+
+#### reactive()레퍼런스 타입만 할당이 가능.
+장점
+- value를 안 붙여도 된다.
+form.title, form.content
+
+단점
+- 객체할당을 하면 반응성을 잃는다.
+form.title = data.title;
+form.content = data.content;
+
+### 게시판 상세 미리보기 만들기!
+목록들이 간략하게 카드 형태로 나열되어 있고,
+하단 섹션에는 게시판 상세 내용 미리보기 영역이 있다.
+
+파라미터 값은 라우트 객체에 의존되어있다.
+라우트에서 ```props:true```를 넣어주면
+파라미터(id값)가 해당 페이지 컴포넌트에 props로 전달된다.
+
+```index.js```
+```js
+{
+	path: '/posts/:id', // 동적 url. 유저마다 다른 여러개의 url을 하나의 페이지에 매핑.
+	name: 'PostDetail',
+	component: PostDetailView,
+	props: true,
+},
+```
+
+해당 페이지 컴포넌트에서 ```defineProps``` 정의
+```PostDetailView.vue```
+```js
+
+// 라우트에서 props로 넘겨줬기 때문에 props로 받기.
+const props = defineProps({
+	id: String,
+});
+..
+//하단에 id로만 정의되어있는 부분에 props.id로 수정
+const fetchPost = () => {
+	const data = getPostById(props.id);
+	form.value = { ...data };
+};
+..
+const goEditPage = () =>
+	router.push({ name: 'PostEdit', params: { id: props.id } });
+
+```
+
+
+
+### id값을 여기저기 보낼 경우, ```index.js```
+보낼 id가 있는 컴포넌트의 라우터에서 ```props:true```
+
+#### 객체 모드로 넘길수도 있음.
+```props:{word: 'hello'}```
+
+#### 함수 모드로 넘기기.
+props에서 속성도 넘길 수 있다.
+```js
 props: (route) => {
 	return {
 		id : parseInt(route.params.id),
-		other: route.query
+		other: route.query..
 	}
 }
-매개변수로 route 넘기고,.. 
+
+// other은 삭제하고 단축해서 적으면..
+props: route => ({ id: parseInt(route.params.id) }),
+```
+
+
+#### 보여 줄 id를 정한다
+PostListView.vue
+```
+<PostDetailView :id="1"></PostDetailView>
+```
+
+
+
+# 다양한 History 모드
+
+## 우선 알아야 할 것
+
+### SPA 
+빌드 파일 생성 /dist
+```bash
+npm run build
+```
+생성되면 파일이 하나다. 구조도 코드도 단촐하다. 난 분명 페이지를 많이 만들었는데. 왜??
+
+이것은, 뷰,리액트,앵귤러 프레임워크는 SPA 기반의 프웍이기 때문이다. => 빌드된 결과물은 하나의 페이지에서 작동한다.(리로딩X) 빠르게 UI를 보여준다.
+
+### 서버 사이드 렌더링
+ui에서 보여질 html문서를 서버에서 만들어 내려주는 것
+
+### 클라이언트 사이드 렌더링
+프웍처럼 js코드로 html를 생성해 사용자에게 보여줌.
+
+### Hash 모드와 History 모드
+Hash모드, History 모드의 차이는 운영서버에 배포할 때 일어난다.
+
+index.js
+```js
+const router = createRouter({
+	history: createWebHistory('/'), // ('/base')로 설정하면, url root에 기본으로 붙는다. /base/about, /base/home..
+	history: createWebHashHistory(),// #이 붙는다.
+	routes,
+});
+```
+
+#### Hash 모드
+createWebHashHistory()
+> 운영서버 배포할 때 ```index.html``` 이 파일만 배포.   
+> 요청은 뒤에 url 제거 (해쉬)   
+> 루트로만 요청하면 index.html 파일 돌려줌.   
+> 어차피 서버에 요청을 루트로 보내니, 서버 설정 없이 배포할수있다.   
+> 웹사이트 크롤링 X. SEO X. 크롤링 봇이 해시를 무시할때가 많다.(치명적 단점)   
+ 
+
+#### History 모드
+CreateWebHistory()
+> 전체 경로 포함해서 요청한다.   
+> 이 경로는 404 뜸.   
+> 그래서 서버 설정을 추가로 해야 한다. 공식문서 가이드 있음.   
+> 대부분 이걸 사용해서 배포.   
