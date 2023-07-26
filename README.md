@@ -2,6 +2,11 @@
 
 # 목차
 1. [VueRouter](#VueRouter) 
+2. [동적 라우트 매칭](#동적-라우트-매칭) 
+3. [id값 다르게 링크 이동](#id값-다르게-링크-이동) 
+4. [404 page Component](#404-page-Component) 
+5. [페이지 컴포넌트에 Props 전달](#페이지-컴포넌트에-Props-전달) 
+6. [다양한 History 모드](#다양한-History-모드) 
 
 # VueRouter
 Vue.js를 이용하여 SPA을 구현할 때 사용하는 Vue.js의 공식 라우터.
@@ -13,11 +18,11 @@ url에 따라 어떤 페이지를 보여줄지 mapping해주는 라이브러리
 npm i vue-router
 ```
 
-src/views  페이지
-src/components  재사용할 컴포넌트
+src/views  <sub>페이지들</sub>
+src/components  <sub>재사용할 컴포넌트들</sub>
 
 ### 사용법
-1. \src\router\**index.js**
+1. \src\router\ **index.js**
 router 정보 설정
 ```js
 'vue-router';
@@ -45,7 +50,7 @@ const router = createRouter({
 export default router;
 ```
 
-2. \src\main.js
+2. \src\ **main.js**
 app.use(router) 호출
 ```js
 import router from '@/router';
@@ -56,17 +61,19 @@ createApp(App).use(router).mount('#app');
 3. 모든 자식 컴포넌트에 router, route 객체 사용가능.
 
 
-### RouterLink a태그 대신 사용
-> 페이지를 리로딩하지않고, url매핑된 페이지 렌더링   
-> active-class : 활성화된 상태에서 추가하는 class 설정 가능.   
-> v-slot 속성 사용 가능.   
+### RouterLink = a태그 대신 사용.
+> 페이지를 리로딩하지 않고, url매핑된 페이지 렌더링   
+> 페이지 이동시 깜빡거림이 없고, 로딩시간이 거의 없다.   
+> **active-class** : 활성화된 상태에서 추가하는 class 설정 가능.   
+> **v-slot** 속성 사용 가능.  
+> **to=""**  단순하게는  to="" 안에 이동할 url을 넣는다. 더 효율적인 방법은 아래에.    
 ```html
 <router-link class="nav-link" active-class="active" to="/">Home</router-link>
 ```
 
 ### $route 내장객체
-> useRouter 임포트하고,    
-> $route로 현재 페이지에 대한 정보를 접근할 수 있다.
+> **useRouter** import하고,    
+> **$route**로 현재 페이지에 대한 정보를 접근할 수 있다.
 ```vue
 <template>
 	<div>
@@ -85,7 +92,7 @@ console.log('route.path', route.path);
 ```
 
 
-### router 링크 이동하는 방법
+### 링크 이동하는 방법들
 
 1. $router에 push
 ```html
@@ -104,7 +111,7 @@ const goAboutPage = () => {
 	router.push('/about');
 };
 ```
-3. 라우트 name으로 이동 ( 권장 )
+3. 라우트 name으로 이동(권장)
 ```html
 <button	@click="goDetailPage">취소</button>
 ..
@@ -123,11 +130,10 @@ const goDetailPage = () => {
 	});
 };
 </script>
-
 ```
 
 
-### 현재 라우트 이름 name 설정
+### 라우트 name 설정
 index.js
 ```
 const routes = [
@@ -147,21 +153,21 @@ const routes = [
 
 # 동적 라우트 매칭
 ```path: '/posts/:id'```
-> 동적 url   
-> 유저마다 다른 여러개의 url을 하나의 페이지에 매핑.    
+> 동적 url이다. 
+> 유저마다 다른 여러 개의 url을 하나의 페이지에 매핑.    
 ```{{ $route.params }}```
-> params의 값은 route에서 설정한 path에서 ':id' 이부분!   
+> **params**의 값은 route에서 설정한 path에서 '**:id**' 이 부분!   
 > 만약 ':abc'로 했으면 abc로 나옴.   
 
 
-### query
+### query <sub>/users?</sub>
 ```
 #route.query 
 /users?searchText=love
 query: { searchText: love }
 ```
 
-### hash
+### hash <sub>/users/#</sub>
 ```
 $route.hash
 /users/#profile
@@ -170,7 +176,6 @@ hash: { profile }
 
 ex)
 /posts/ddd?searchText=Vue3bible#profile
-
 ```html
 <p>params: {{ $route.params }}</p>
 <p>query: {{ $route.query }}</p>
@@ -185,13 +190,23 @@ searchText: Vue3bible
 hash: profile
 ```
 
-### ui 컴포넌트 파악 tip
+/posts/ddd#hashvalue
+```html
+<p>hash: {{ $route.hash }}</p>
+...
+//출력
+hash: #hashvalue
+```
+
+
+
+### ui 컴포넌트 파악하기
 1. grid시스템 살펴보기
 2. 사전에 정의해놓은 class들(help-class) 살펴보기
 
 
 
-# id값 다르게 상세 이동
+# id값 다르게 링크 이동
 1. 하드코딩
 ```js
 @click="goPage(post.id)"
@@ -215,9 +230,9 @@ const goPage = id => {
 ```
 
 3. 쿼리, 해쉬와 함께 사용
-/posts/1?searhText=hello#world
-/posts/2?searhText=hello#world
-...
+>	/posts/1?searhText=hello#world	
+>	/posts/2?searhText=hello#world 	
+> ...   
 ```js
 router.push({
   name: 'PostDetail',
@@ -232,7 +247,7 @@ router.push({
 ```
 
 # 404 page Component
-엉뚱한 url로 이동했을 때 이동할 페이지를 설정한다.
+엉뚱한 url로 이동했을 때 이동할 페이지를 설정한다.   
 index.js
 ```js
 const routes = [
@@ -282,10 +297,10 @@ const routes = [
 
 > 현재 페이지 컴포넌트를 '대체'한다.   
 > 히스토리에 쌓이지 않는다.   
-> 예를 들면, 페이지 이동을 about -> nested -> nested/one 페이지로 이동했다고 하자.   
-> nested에 딸린 페이지 one, two는 link를 router.replace로 처리하였다.   
-> 이 때, one과 two 페이지는 nested 페이지를 대체한다.   
-> 그래서 one(또는 two, three four..) 페이지에서 뒤로 가기를 누르면 about 페이지가 나온다.   
+>	> 예를 들면, 페이지 이동을 about -> nested -> nested/one 페이지로 이동했다고 하자.   
+>	> nested에 딸린 페이지 one, two는 link를 router.replace로 처리하였다.   
+>	> 이 때, one과 two 페이지는 nested 페이지를 대체한다.   
+>	> 그래서 one(또는 two, three four..) 페이지에서 뒤로 가기를 누르면 about 페이지가 나온다.   
 ```html
 // replace 사용 안함
 <router-link to="/nested/one">Nested One</router-link>
@@ -293,8 +308,6 @@ const routes = [
 //replace 사용
 <router-link :to="{ name: 'NestedOne', replace: true }">Nested One</router-link>
 ```
-
-
 
 # 페이지 컴포넌트에 Props 전달
 
@@ -322,37 +335,42 @@ const fetchPost = () => {
 
 
 ### reactive()와 ref() 의 차이
+일관성 유지를 위해 보통 ref()를 쓴다.
 
-#### ref() 레퍼런스,프리미티브 모두 할당 가능.
+#### ref()
 장점
+- reference(참조타입. array.function. object. date .. ), Primitive(원시타입. Number, String, Boolean, Null, undefined) 모두 할당 가능.
 - 한꺼번에 객체 할당 가능 + 반응형 살아있음
-form.value = {...data}
+- form.value = {...data}
 - 일관성 유지
 
 단점
 - .value를 계속 붙여야 한다.
-form.value.title, form.value.content
+- form.value.title, form.value.content
 
-
-#### reactive()레퍼런스 타입만 할당이 가능.
+#### reactive()
 장점
 - value를 안 붙여도 된다.
-form.title, form.content
+- form.title, form.content
 
 단점
+- 레퍼런스 타입만 할당이 가능.
 - 객체할당을 하면 반응성을 잃는다.
-form.title = data.title;
-form.content = data.content;
+- form.title = data.title;
+- form.content = data.content;
 
 ### 게시판 상세 미리보기 만들기!
 목록들이 간략하게 카드 형태로 나열되어 있고,
+
 하단 섹션에는 게시판 상세 내용 미리보기 영역이 있다.
 
-파라미터 값은 라우트 객체에 의존되어있다.
+파라미터 값은 라우트 객체에 의존되어 있다.
+
 라우트에서 ```props:true```를 넣어주면
+
 파라미터(id값)가 해당 페이지 컴포넌트에 props로 전달된다.
 
-```index.js```
+**index.js**
 ```js
 {
 	path: '/posts/:id', // 동적 url. 유저마다 다른 여러개의 url을 하나의 페이지에 매핑.
@@ -363,7 +381,8 @@ form.content = data.content;
 ```
 
 해당 페이지 컴포넌트에서 ```defineProps``` 정의
-```PostDetailView.vue```
+
+**PostDetailView.vue**
 ```js
 
 // 라우트에서 props로 넘겨줬기 때문에 props로 받기.
@@ -371,7 +390,7 @@ const props = defineProps({
 	id: String,
 });
 ..
-//하단에 id로만 정의되어있는 부분에 props.id로 수정
+//하단에 id로만 정의되어있는 부분 props.id로 수정
 const fetchPost = () => {
 	const data = getPostById(props.id);
 	form.value = { ...data };
@@ -387,11 +406,12 @@ const goEditPage = () =>
 ### id값을 여기저기 보낼 경우, ```index.js```
 보낼 id가 있는 컴포넌트의 라우터에서 ```props:true```
 
-#### 객체 모드로 넘길수도 있음.
+#### 객체 모드로 넘길수도 있음.   
 ```props:{word: 'hello'}```
 
-#### 함수 모드로 넘기기.
-props에서 속성도 넘길 수 있다.
+#### 함수 모드로 넘기기.   
+props에서 속성도 넘길 수 있다.   
+*parseInt() - 문자열을 정수로 바꾸는 함수   
 ```js
 props: (route) => {
 	return {
@@ -416,15 +436,13 @@ PostListView.vue
 # 다양한 History 모드
 
 ## 우선 알아야 할 것
-
 ### SPA 
-빌드 파일 생성 /dist
+빌드 파일 생성 '/dist'
 ```bash
 npm run build
 ```
-생성되면 파일이 하나다. 구조도 코드도 단촐하다. 난 분명 페이지를 많이 만들었는데. 왜??
-
-이것은, 뷰,리액트,앵귤러 프레임워크는 SPA 기반의 프웍이기 때문이다. => 빌드된 결과물은 하나의 페이지에서 작동한다.(리로딩X) 빠르게 UI를 보여준다.
+생성되면 파일이 하나다. 구조도 코드도 단촐하다. 난 분명 페이지를 많이 만들었는데!!! 왜일까?   
+뷰,리액트,앵귤러는 SPA 기반의 프레임워크이기 때문이다. 즉, 빌드된 결과물은 하나의 페이지에서 작동한다. 리로딩하지 않고 빠르게 UI를 보여준다.
 
 ### 서버 사이드 렌더링
 ui에서 보여질 html문서를 서버에서 만들어 내려주는 것
