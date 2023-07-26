@@ -1,3 +1,4 @@
+import axios from 'axios';
 //axios
 const posts = [
 	{
@@ -32,10 +33,22 @@ const posts = [
 	},
 ];
 
-export function getPosts() {
-	return posts;
+export function getPosts(params) {
+	return axios.get('http://localhost:5000/posts', { params });
 }
-
+// 단건 조회
 export function getPostById(id) {
-	return posts.find(item => item.id === id);
+	return axios.get(`http://localhost:5000/posts/${id}`);
+}
+// 등록
+export function createPost(data) {
+	return axios.post('http://localhost:5000/posts', data);
+}
+// 수정
+export function updatePost(id, data) {
+	return axios.put(`http://localhost:5000/posts/${id}`, data);
+}
+// 삭제
+export function deletePost(id) {
+	return axios.delete(`http://localhost:5000/posts/${id}`);
 }

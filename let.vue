@@ -13,11 +13,11 @@
 				/>
 			</div>
 			<div class="mb-3">
-				<label for="contents" class="form-label">내용</label>
+				<label for="content" class="form-label">내용</label>
 				<textarea
 					v-model="form.content"
 					class="form-control"
-					id="contents"
+					id="content"
 					rows="3"
 				></textarea>
 			</div>
@@ -29,7 +29,7 @@
 				>
 					목록
 				</button>
-				<button type="button" class="btn btn-primary">저장</button>
+				<button class="btn btn-primary">저장</button>
 			</div>
 		</form>
 	</div>
@@ -45,7 +45,6 @@ const form = ref({
 	title: null,
 	content: null,
 });
-
 const save = async () => {
 	try {
 		await createPost({
@@ -57,7 +56,6 @@ const save = async () => {
 		console.error(error);
 	}
 };
-
 const goListPage = () => router.push({ name: 'PostList' });
 </script>
 

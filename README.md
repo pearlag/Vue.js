@@ -4,9 +4,9 @@
 1. [VueRouter](#VueRouter) 
 2. [동적 라우트 매칭](#동적-라우트-매칭) 
 3. [id값 다르게 링크 이동](#id값-다르게-링크-이동) 
-4. [404 page Component](#404-page-Component) 
-5. [페이지 컴포넌트에 Props 전달](#페이지-컴포넌트에-Props-전달) 
-6. [다양한 History 모드](#다양한-History-모드) 
+4. [404 page Component](#404-page-component) 
+5. [페이지 컴포넌트에 Props 전달](#페이지-컴포넌트에-props-전달) 
+6. [다양한 History 모드](#다양한-history-모드) 
 
 # VueRouter
 Vue.js를 이용하여 SPA을 구현할 때 사용하는 Vue.js의 공식 라우터.
@@ -477,3 +477,246 @@ CreateWebHistory()
 > 이 경로는 404 뜸.   
 > 그래서 서버 설정을 추가로 해야 한다. 공식문서 가이드 있음.   
 > 대부분 이걸 사용해서 배포.   
+
+
+
+# API 서버 통신
+
+### github json-server library
+명령어 하나로 api서버 생성 가능.
+```bash
+npm i -D json-server
+npx json-server --watch db.json //api 서버 실행, db.json 생성
+db.json 파일에 posts data 넣기
+npx json-server --watch db.json --port 5000
+package.json에 명령어 등록
+..
+npm run db
+```
+
+### github axios
+서버와 통신하기 위한 비동기 통신 모듈.
+```bash
+npm i axios
+```
+
+posts.js
+```js
+export function getPosts() {
+	return axios.get('http://localhost:5000/posts');
+}
+// 단건 조회
+export function getPostById(id) {
+	return axios.get(`http://localhost:5000/posts/${id}`);
+}
+// 등록
+export function createPost(data) {
+	return axios.post('http://localhost:5000/posts', data);
+}
+// 수정
+export function updatePost(id, data) {
+	return axios.put(`http://localhost:5000/posts/${id}`, data);
+}
+// 삭제
+export function deletePost(id) {
+	return axios.delete(`http://localhost:5000/posts/${id}`);
+}
+```
+
+### promise
+자바스크립트에서 비동기를 처리할 때 사용하는 객체.
+값을 받을땐
+```js
+const fetchPosts = () => {
+	getPosts()
+		.then(response => {
+			console.log('response: ', response);
+		})
+		.catch(error => {
+			console.log('error: ', error);
+		});
+};
+```
+
+### promise 객체 대신 async awit (promise의 문법적 설탕)
+```js
+const fetchPosts = async () => {
+	try {
+		const { data } = await getPosts();
+		posts.value = data;
+	} catch (error) {
+		console.error(error);
+	}
+};
+```
+
+오류를 받을 때 catch()
+
+객체를 로그로 출력할 땐 console.dir()을 사용하면 편하다.
+ex) ```console.dir(response)```
+
+
+### 게시글 등록 구현
+1. 폼 객체 생성
+PostCreateView.vue
+```js
+const form = ref({
+	title: null,
+	content: null,
+});
+```
+2. v-model 바인딩 및 save 메서드 넣기
+PostCreateView.vue
+```html
+<form @submit.prevent="save">
+..
+<input
+	v-model="form.title"
+	type="text"
+	class="form-control"
+	id="title"
+/>
+..
+<textarea
+	v-model="form.content"
+	class="form-control"
+	id="contents"
+	rows="3"
+></textarea>
+```
+
+3. save 메서드 등록
+PostCreateView.vue
+```js
+import { createPost } from '@/api/posts';
+...
+const save = () => {
+	try {
+		createPost({
+			...form.value,
+			createdAt: Date.now(),
+		});
+		router.push({ name: 'PostList' });
+	} catch (error) {
+		console.error(error);
+	}
+};
+```
+
+db.js 파일에도 data가 추가된다.
+
+### 글 상세 페이지 구현
+postDetailView.vue
+```js
+<h2>{{ post.title }}</h2>
+<p>{{ post.content }}</p>
+<p>{{ post.createdAt }}</p>
+const post = ref({
+	title: null,
+	content: null,
+	createdAt: null,
+});
+..
+const fetchPost = async () => {
+	try {
+		const { data } = await getPostById(props.id);
+		setPost(data);
+	} catch (error) {
+		console.error(error);
+	}
+};
+const setPost = ({ title, content, createdAt }) => {
+	post.value.title = title;
+	post.value.content = content;
+	post.value.createdAt = createdAt;
+};
+fetchPost();
+```
+
+### 글 수정 구현
+PostEditView.vue
+```js
+<form @submit.prevent="edit">
+..
+<input
+		v-model="form.title"
+		type="text"
+		class="form-control"
+		id="title"
+	/>
+<textarea
+	v-model="form.content"
+	class="form-control"
+	id="contents"
+	rows="3"
+></textarea>
+...
+
+import { getPostById, updatePost } from '@/api/posts';
+..
+const form = ref({
+	title: null,
+	content: null,
+});
+const fetchPost = async () => {
+	try {
+		const { data } = await getPostById(id);
+		setForm(data);
+	} catch (error) {
+		console.error(error);
+	}
+};
+..
+const setForm = ({ title, content }) => {
+	form.value.title = title;
+	form.value.content = content;
+};
+...
+const edit = async () => {
+	try {
+		await updatePost(id, { ...form.value });
+		router.push({ name: 'PostDetail', params: { id } });
+	} catch (error) {
+		console.error(error);
+	}
+};
+```
+
+
+### 글 삭제 구현
+PostDetailView.vue
+```js
+<button class="btn btn-outline-danger" @click="remove">삭제</button>
+..
+import { getPostById, deletePost } from '@/api/posts';
+...
+const remove = async () => {
+	try {
+		if (confirm('삭제하시겠습니까?') === false) {
+			return;
+		}
+		await deletePost(props.id);
+		router.push({ name: 'PostList' });
+	} catch (error) {
+		console.error(error);
+	}
+};
+```
+
+
+# Pagination & Filter 구현
+
+### _sort
+정렬의 기준이 되는 key
+
+### order
+asc: 오름차순   
+desc: 내림차순
+
+posts.js에 정의
+```js
+const params = ref({
+	_sort: 'createAt',
+	_order: 'desc',
+});
+```
