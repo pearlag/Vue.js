@@ -17,7 +17,7 @@ src/views  페이지
 src/components  재사용할 컴포넌트
 
 ### 사용법
-1. \src\router\index.js
+1. \src\router\**index.js**
 router 정보 설정
 ```js
 'vue-router';
