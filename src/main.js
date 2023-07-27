@@ -1,13 +1,15 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import { createApp } from 'vue';
 import App from './App.vue';
+import router from '@/router';
 
-const app = createApp(App);
-
-// app.component('AppCard', AppCard);
-
-app.provide('app-message', 'app message 입니다');
-// 모든 컴포넌트에서 접근하고싶은
-app.config.globalProperties.msg = 'hello';
-app.mount('#app');
+createApp(App).use(router).mount('#app');
 import 'bootstrap/dist/js/bootstrap.js';
+
+// console.log('MODE: ', import.meta.env.MODE);
+// console.log('MODE: ', import.meta.env.BASE_URL);
+// console.log('MODE: ', import.meta.env.PROD);
+// console.log('MODE: ', import.meta.env.DEV);
+
+// console.log('VITE_APP_API_URL: ', import.meta.env.VITE_APP_API_URL);
