@@ -491,7 +491,7 @@ db.json 파일에 posts data 넣기
 npx json-server --watch db.json --port 5000
 package.json에 명령어 등록
 ..
-npm run db
+npm run db // 이 명령어 띄우고 localhost 띄워야 데이터 보임!
 ```
 
 ### github axios
@@ -704,19 +704,178 @@ const remove = async () => {
 ```
 
 
-# Pagination & Filter 구현
-
+# Pagination & Filter 구현 
+github.com/typicode/json-server 참고
 ### _sort
 정렬의 기준이 되는 key
-
 ### order
 asc: 오름차순   
 desc: 내림차순
 
-posts.js에 정의
-```js
+PostListView.vue
+```vue
+<template>
+	<div>
+		<h2>게시글 목록</h2>
+		<hr class="my-4" />
+		<form @submit.prevent><!-- 제출 기능(기본기능) 막기 -->
+			<div class="row g-3">
+				<div class="col">
+					<input v-model="params.title_like" type="text" class="form-control" /><!-- 검색 기능. v-model에 title_like 값을 양방향 바인딩. -->
+				</div>
+				<div class="col-3">
+					<select v-model="params._limit" class="form-select"><!-- 필터 기능. v-model에 limit 값을 바인딩. -->
+						<option value="3">3개씩 보기</option>
+						<option value="6">6개씩 보기</option>
+						<option value="9">9개씩 보기</option>
+					...
+		<nav class="mt-5" aria-label="Page navigation example">
+			<ul class="pagination justify-content-center">
+				<li class="page-item" :class="{ disabled: !(params._page > 1) }">
+					<a
+						class="page-link"
+						href="#"
+						aria-label="Previous"
+						@click.prevent="--params._page"
+					>
+						<span aria-hidden="true">&laquo;</span>
+					</a>
+				</li>
+				<li
+					v-for="page in pageCount"
+					key="page"
+					class="page-item"
+					:class="{ active: params._page === page }"
+				>
+					<a class="page-link" href="#" @click.prevent="params._page = page">{{
+						page
+					}}</a>
+				</li>
+				<li
+					class="page-item"
+					:class="{ disabled: !(params._page < pageCount) }"
+				>
+					<a
+						class="page-link"
+						href="#"
+						aria-label="Next"
+						@click.prevent="++params._page"
+					>
+						<span aria-hidden="true">&raquo;</span>
+					</a>
+				</li>
+			</ul>
+		</nav>
+		<hr class="my-5" />
+		<AppCard>
+			<PostDetailView :id="1"></PostDetailView>
+		</AppCard>
+	</div>
+</template>
+<script setup>
 const params = ref({
-	_sort: 'createAt',
-	_order: 'desc',
+	_sort: 'createdAt',  // 기준
+	_order: 'desc', // 내림차순 장랼
+	_limit: 3, //몇 개씩 조회할 것인지?
+	_page: 1, // 어느 페이지를 보여줄 것인지?
+	title_like: '', // 검색. 일단 빈값을 넣고 값을 받을 input에 v-model로 연결한다.
 });
+//paganation
+const totalCount = ref(0);
+const pageCount = computed(() =>
+	Math.ceil(totalCount.value / params.value._limit),
+); // 올림한다. (토탈카운트의 값 나누기 조회할 페이지를)
+
+const fetchPosts = async () => {
+	try {
+		const { data, headers } = await getPosts(params.value);
+		posts.value = data;
+		totalCount.value = headers['x-total-count']; // header 값으로 x-total-cout를 받아와 변수에 넣는다.
+	} catch (error) {
+		console.error(error);
+	}
+};
+watchEffect(fetchPosts); // v-model로 인해서 변경이 일어나면 다시 실행한다.(페이지 이동 후 리스트 재생성)
+..
+</script>
+```
+
+# axios 모듈, Vite 환경 변수 설정
+
+### axios 라이브러리를 모듈로 분리
+
+api/index.js 생성
+```js
+import axios from 'axios'; //axios를 이 파일에서 임포트한다
+
+// create라는 함수에 baseURL, options 파라미터를 설정하고 
+// instance 변수를 담고 리턴한다.
+function create(baseURL, options) {
+	const instance = axios.create(Object.assign({ baseURL }, options));
+	return instance;
+} 
+
+// posts 변수에 create 변수를 담고, 파라미터 값으로 게시판 url을 설정해서 내보낸다.
+export const posts = create('http://localhost:5000/posts');
+```
+
+posts.js 수정
+```js
+// axios 임포트를 지우고 앞전에 만든 posts 변수를 받는다.
+import { posts } from '.';
+
+// 중복으로 들어갔던 http://localhost:5000.. url을 지운다.
+// axios 대신 posts를 넣는다.
+export function getPosts(params) {
+	return posts.get('/', { params });
+}
+// 단건 조회
+export function getPostById(id) {
+	return posts.get(id + '');
+}
+// 등록
+export function createPost(data) {
+	return posts.post('', data);
+}
+// 수정
+export function updatePost(id, data) {
+	return posts.put(`/${id}`, data);
+}
+// 삭제
+export function deletePost(id) {
+	return posts.delete(id + '');
+}
+```
+
+vite 공식 홈페이지 -env - 환경 변수
+import.meta.env.MODE // 현재 구동되는 애플리케이션이 어떤 모드인지 개발?운영
+vite.config.js 옵션에서 설정 가능. 디폴트는 dev모드.
+
+import.meta.env.BASE_URL
+import.meta.env.PROD // 현재 운영 모드인가? boolean 값
+import.meta.env.DEV // 현재 개발 모드인가? boolean 값
+
+
+개발/운영 모드에 따라 다른 url을 가져오려면
+환경 변수를 설정해야 한다.
+.env Files
+
+.env
+```
+VITE_APP_API_URL=http://localhost:5001
+```
+
+.env_development(우선순위가 더 높다. 그래서 default값이다.)
+```
+VITE_APP_API_URL=http://localhost:5000
+```
+
+접두사 VITE를 수정하고 싶다면
+vite.config.js의 defineConfig 설정에서
+envPrefix:'변경할 값'
+
+api/index.js url 수정
+```js
+...
+export const posts = create(`${import.meta.env.VITE_APP_API_URL}/posts`);
 ```

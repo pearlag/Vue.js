@@ -40,8 +40,8 @@ const routes = [
 		path: '/posts/:id', // 동적 url. 유저마다 다른 여러개의 url을 하나의 페이지에 매핑.
 		name: 'PostDetail',
 		component: PostDetailView,
-		// props: true,
-		props: route => ({ id: parseInt(route.params.id) }),
+		props: true,
+		// props: route => ({ id: parseInt(route.params.id) }),
 	},
 	{
 		path: '/posts/:id/edit',
