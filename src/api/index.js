@@ -1,3 +1,4 @@
+// axios를 가져오고, 게시판 url의 기본 값을 설정하기 위한 api 파일.
 import axios from 'axios';
 
 function create(baseURL, options) {

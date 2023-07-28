@@ -775,7 +775,7 @@ PostListView.vue
 <script setup>
 const params = ref({
 	_sort: 'createdAt',  // 기준
-	_order: 'desc', // 내림차순 장랼
+	_order: 'desc', // 내림차순 정렬
 	_limit: 3, //몇 개씩 조회할 것인지?
 	_page: 1, // 어느 페이지를 보여줄 것인지?
 	title_like: '', // 검색. 일단 빈값을 넣고 값을 받을 input에 v-model로 연결한다.
@@ -847,17 +847,17 @@ export function deletePost(id) {
 }
 ```
 
-vite 공식 홈페이지 -env - 환경 변수
-import.meta.env.MODE // 현재 구동되는 애플리케이션이 어떤 모드인지 개발?운영
-vite.config.js 옵션에서 설정 가능. 디폴트는 dev모드.
+vite 공식 홈페이지 -env - 환경 변수   
+import.meta.env.MODE // 현재 구동되는 애플리케이션이 어떤 모드인지 (개발 or 운영)   
+vite.config.js 옵션에서 설정 가능. 디폴트는 dev모드.   
 
-import.meta.env.BASE_URL
-import.meta.env.PROD // 현재 운영 모드인가? boolean 값
-import.meta.env.DEV // 현재 개발 모드인가? boolean 값
+import.meta.env.BASE_URL   
+import.meta.env.PROD // 현재 운영 모드인가? boolean 값   
+import.meta.env.DEV // 현재 개발 모드인가? boolean 값   
 
 
-개발/운영 모드에 따라 다른 url을 가져오려면
-환경 변수를 설정해야 한다.
+개발/운영 모드에 따라 다른 url을 가져오려면   
+환경 변수를 설정해야 한다.   
 .env Files
 
 .env
@@ -879,3 +879,54 @@ api/index.js url 수정
 ...
 export const posts = create(`${import.meta.env.VITE_APP_API_URL}/posts`);
 ```
+
+
+# 공통 컴포넌트 분리
+한 번 더 듣기
+
+# 버그 수정 : HTTP PUT vs PATCH
+
+# Transitions
+
+vue 내장 컴포넌트.
+나타나고 사라지는 animation 구현
+
+- v-if
+- v-show
+- <component>
+
+AppAlert.vue
+```vue
+<template>
+	<Transition name="slide">
+		<div v-if="show" class="app-alert alert" role="alert" :class="typeStyle">
+			{{ message }}
+		</div>
+	</Transition>
+</template>
+
+<style scoped>
+.slide-enter-from,
+.slide-leave-to {
+	opacity: 0;
+	transform: translateY(-30px);
+}
+.slide-enter-active,
+.slide-leave-active {
+	transition: all 0.5s ease;
+}
+.slide-enter-to,
+.slide-leave-from {
+	opacity: 1;
+	transform: translateY(0px);
+}
+</style>
+```
+- v-enter-from 같은 class명은 transition 컴포넌트의 기능이다.(공식문서 참고) 나타나고 사라질 때 스타일속성을 부여할 수 있다.
+- Transition 컴포넌트의 name을 설정해주면 css에서 v 접두사 대신에 쓸 수 있다.
+
+
+
+# TransitionGroup
+v-for 목록에 삽입.
+제거 또는 이동할 때 애니메이션 적용
