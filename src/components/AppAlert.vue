@@ -1,32 +1,32 @@
 <template>
-	<Transition name="slide">
+	<!-- <Transition name="slide">
 		<div v-if="show" class="app-alert alert" role="alert" :class="typeStyle">
 			{{ message }}
 		</div>
-	</Transition>
+	</Transition> -->
+	<div class="app-alert">
+		<transition-group name="slide">
+			<div
+				v-for="({ message, type }, index) in items"
+				:key="index"
+				class="alert"
+				role="alert"
+				:class="typeStyle(type)"
+			>
+				{{ message }}
+			</div>
+		</transition-group>
+	</div>
 </template>
 
 <script setup>
 import { computed } from 'vue';
 
-const props = defineProps({
-	show: {
-		type: Boolean,
-		default: false,
-	},
-	message: {
-		type: String,
-		required: true,
-	},
-	type: {
-		type: String,
-		default: 'error',
-		validator: value => ['success', 'error'].includes(value),
-	},
+defineProps({
+	items: Array,
 });
-const typeStyle = computed(() =>
-	props.type === 'error' ? 'alert-danger' : 'alert-primary',
-);
+
+const typeStyle = type => (type === 'error' ? 'alert-danger' : 'alert-primary');
 </script>
 
 <style scoped>
