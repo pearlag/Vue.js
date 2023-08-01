@@ -930,3 +930,6 @@ AppAlert.vue
 # TransitionGroup
 v-for 목록에 삽입.
 제거 또는 이동할 때 애니메이션 적용
+
+
+# 모달modal 팝업
