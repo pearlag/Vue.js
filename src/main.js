@@ -5,8 +5,18 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from '@/router';
+import globalDirectives from '@/plugins/global-directives';
+import dayjs from '@/plugins/dayjs';
+// import focus from '@/directives/focus';
+// import globalComponents from '@/plugins/global-components';
 
-createApp(App).use(router).mount('#app');
+const app = createApp(App);
+// app.use(globalComponents);
+// app.directive('focus', focus);
+app.use(router);
+app.use(globalDirectives);
+app.use(dayjs);
+app.mount('#app');
 import 'bootstrap/dist/js/bootstrap.js';
 
 // console.log('MODE: ', import.meta.env.MODE);

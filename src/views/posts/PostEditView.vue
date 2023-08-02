@@ -18,7 +18,7 @@
 				<button type="button" class="btn btn-primary">수정</button>
 			</template>
 		</PostForm>
-		<AppAlert :show="showAlert" :message="alertMessage" :type="alertType" />
+		<!-- <AppAlert :show="showAlert" :message="alertMessage" :type="alertType" /> -->
 	</div>
 </template>
 
@@ -27,7 +27,9 @@ import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getPostById, updatePost } from '@/api/posts';
 import PostForm from '@/components/posts/PostForm.vue';
-import AppAlert from '@/components/AppAlert.vue';
+import { useAlert } from '@/composables/alert';
+
+const { vAlert, vSuccess } = useAlert();
 
 const route = useRoute();
 const router = useRouter();
@@ -43,7 +45,7 @@ const fetchPost = async () => {
 		setForm(data);
 	} catch (error) {
 		console.error(error);
-		vAlert('네트워크 오류!');
+		vAlert(error.message);
 	}
 };
 const setForm = ({ title, content }) => {
@@ -55,10 +57,10 @@ const edit = async () => {
 	try {
 		await updatePost(id, { ...form.value });
 		router.push({ name: 'PostDetail', params: { id } });
-		vAlert('수정이 완료되었습니다.');
+		vSuccess('수정이 완료되었습니다.');
 	} catch (error) {
 		console.error(error);
-		vAlert('네트워크 오류!');
+		vAlert(error.message);
 	}
 };
 
@@ -67,21 +69,6 @@ const goDetailPage = () => {
 		name: 'PostDetail',
 		params: { id },
 	});
-};
-
-//alert
-
-const showAlert = ref(false);
-const alertMessage = ref('');
-const alertType = ref('');
-
-const vAlert = (message, type = 'error') => {
-	showAlert.value = true;
-	alertMessage.value = message;
-	alertType.value = type;
-	setTimeout(() => {
-		showAlert.value = false;
-	}, 2000);
 };
 </script>
 
