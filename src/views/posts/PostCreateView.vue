@@ -2,36 +2,25 @@
 	<div>
 		<h2>게시글 등록</h2>
 		<hr class="my-4" />
-		<form @submit.prevent="save">
-			<div class="mb-3">
-				<label for="title" class="form-label">제목</label>
-				<input
-					v-model="form.title"
-					type="text"
-					class="form-control"
-					id="title"
-				/>
-			</div>
-			<div class="mb-3">
-				<label for="contents" class="form-label">내용</label>
-				<textarea
-					v-model="form.content"
-					class="form-control"
-					id="contents"
-					rows="3"
-				></textarea>
-			</div>
-			<div class="pt-4">
-				<button
-					type="button"
-					class="btn btn-outline-dark me-2"
-					@click="goListPage"
-				>
+		<AppError v-if="error" :message="error.message"></AppError>
+		<PostForm
+			v-model:title="form.title"
+			v-model:content="form.content"
+			@submit.prevent="save"
+		>
+			<template #actions>
+				<button type="button" class="btn btn-outline-dark" @click="goListPage">
 					목록
 				</button>
-				<button type="button" class="btn btn-primary">저장</button>
-			</div>
-		</form>
+				<button class="btn btn-primary" :disabled="loading">
+					<template v-if="loading">
+						<span class="spinner-grow spinner-grow-sm" role="status"></span>
+						<span class="visually-hidden">Loading</span>
+					</template>
+					<template v-else>저장</template>
+				</button>
+			</template>
+		</PostForm>
 	</div>
 </template>
 
@@ -39,22 +28,32 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { createPost } from '@/api/posts';
+import PostForm from '@/components/posts/PostForm.vue';
+import { useAlert } from '@/composables/alert';
+
+const { vAlert, vSuccess } = useAlert();
 
 const router = useRouter();
 const form = ref({
 	title: null,
 	content: null,
 });
-
-const save = () => {
+const loading = ref(false);
+const error = ref(null);
+const save = async () => {
 	try {
-		createPost({
+		loading.value = true;
+		await createPost({
 			...form.value,
 			createdAt: Date.now(),
 		});
-		router.push({ name: 'PostList' });
-	} catch (error) {
-		console.error(error);
+		//router.push({ name: 'PostList' });
+		vSuccess('등록이 완료되었습니다.');
+	} catch (err) {
+		error.value = err;
+		vAlert(err.message);
+	} finally {
+		loading.value = false;
 	}
 };
 

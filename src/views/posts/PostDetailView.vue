@@ -1,8 +1,12 @@
 <template>
-	<div>
+	<AppLoading v-if="loading" />
+	<AppError v-else-if="error" :message="error.message" />
+	<div v-else>
 		<h2>{{ post.title }}</h2>
 		<p>{{ post.content }}</p>
-		<p class="text-muted">{{ post.createdAt }}</p>
+		<p class="text-muted">
+			{{ $dayjs(post.createdAt).format('YYYY. MM. DD. HH:mm:ss') }}
+		</p>
 		<hr class="my-4" />
 		<div class="row g-2">
 			<div class="col-auto">
@@ -33,7 +37,7 @@ import { getPostById, deletePost } from '@/api/posts';
 import { ref } from 'vue';
 
 const props = defineProps({
-	id: String,
+	id: [String, Number],
 });
 
 const router = useRouter();
@@ -43,13 +47,18 @@ const post = ref({
 	content: null,
 	createdAt: null,
 });
+const error = ref(null);
+const loading = ref(false);
 
 const fetchPost = async () => {
 	try {
+		loading.value = true;
 		const { data } = await getPostById(props.id);
 		setPost(data);
-	} catch (error) {
-		console.error(error);
+	} catch (err) {
+		error.value = err;
+	} finally {
+		loading.value = false;
 	}
 };
 const setPost = ({ title, content, createdAt }) => {

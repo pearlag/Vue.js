@@ -1,3 +1,4 @@
+// history 모드를 설정하고, 컴포넌트를 받아서 path,name을 설정하는 곳.
 import {
 	createRouter,
 	createWebHashHistory,

@@ -775,7 +775,7 @@ PostListView.vue
 <script setup>
 const params = ref({
 	_sort: 'createdAt',  // 기준
-	_order: 'desc', // 내림차순 장랼
+	_order: 'desc', // 내림차순 정렬
 	_limit: 3, //몇 개씩 조회할 것인지?
 	_page: 1, // 어느 페이지를 보여줄 것인지?
 	title_like: '', // 검색. 일단 빈값을 넣고 값을 받을 input에 v-model로 연결한다.
@@ -847,17 +847,17 @@ export function deletePost(id) {
 }
 ```
 
-vite 공식 홈페이지 -env - 환경 변수
-import.meta.env.MODE // 현재 구동되는 애플리케이션이 어떤 모드인지 개발?운영
-vite.config.js 옵션에서 설정 가능. 디폴트는 dev모드.
+vite 공식 홈페이지 -env - 환경 변수   
+import.meta.env.MODE // 현재 구동되는 애플리케이션이 어떤 모드인지 (개발 or 운영)   
+vite.config.js 옵션에서 설정 가능. 디폴트는 dev모드.   
 
-import.meta.env.BASE_URL
-import.meta.env.PROD // 현재 운영 모드인가? boolean 값
-import.meta.env.DEV // 현재 개발 모드인가? boolean 값
+import.meta.env.BASE_URL   
+import.meta.env.PROD // 현재 운영 모드인가? boolean 값   
+import.meta.env.DEV // 현재 개발 모드인가? boolean 값   
 
 
-개발/운영 모드에 따라 다른 url을 가져오려면
-환경 변수를 설정해야 한다.
+개발/운영 모드에 따라 다른 url을 가져오려면   
+환경 변수를 설정해야 한다.   
 .env Files
 
 .env
@@ -879,3 +879,356 @@ api/index.js url 수정
 ...
 export const posts = create(`${import.meta.env.VITE_APP_API_URL}/posts`);
 ```
+
+
+# 공통 컴포넌트 분리
+한 번 더 듣기
+
+# 버그 수정 : HTTP PUT vs PATCH
+
+# Transitions
+
+vue 내장 컴포넌트.
+나타나고 사라지는 animation 구현
+
+- v-if
+- v-show
+- <component>
+
+AppAlert.vue
+```vue
+<template>
+	<Transition name="slide">
+		<div v-if="show" class="app-alert alert" role="alert" :class="typeStyle">
+			{{ message }}
+		</div>
+	</Transition>
+</template>
+
+<style scoped>
+.slide-enter-from,
+.slide-leave-to {
+	opacity: 0;
+	transform: translateY(-30px);
+}
+.slide-enter-active,
+.slide-leave-active {
+	transition: all 0.5s ease;
+}
+.slide-enter-to,
+.slide-leave-from {
+	opacity: 1;
+	transform: translateY(0px);
+}
+</style>
+```
+- v-enter-from 같은 class명은 transition 컴포넌트의 기능이다.(공식문서 참고) 나타나고 사라질 때 스타일속성을 부여할 수 있다.
+- Transition 컴포넌트의 name을 설정해주면 css에서 v 접두사 대신에 쓸 수 있다.
+
+
+
+# TransitionGroup
+v-for 목록에 삽입.
+제거 또는 이동할 때 애니메이션 적용
+```html
+<transition-group name="slide">
+	<div
+		v-for="({ message, type }, index) in items"
+		:key="index"
+		class="alert"
+		role="alert"
+		:class="typeStyle(type)"
+	>
+		{{ message }}
+	</div>
+</transition-group>
+```
+
+# 모달modal 팝업
+# Teleport 컴포넌트
+컴포넌트를 특정 돔으로 위치이동시키는 내장 컴포넌트. vue3에서 사용 가능
+선언 없이 사용 가능하다.
+teleport to="#위치이동시킬곳"
+예를 들면, 모달팝업 노드를 가장 바깥에 위치시킬 수 있다.
+
+**하위 컴포넌트**
+```html
+<teleport to="#modal">
+	<PostModal
+		v-model="show"
+		:title="modalTitle"
+		:content="modalContent"
+		:createdAt="modalCreatedAt"
+	/>
+</teleport>
+```
+
+**index.html**
+```html
+<body>
+	<div id="app"></div>
+	<div id="modal"></div>
+	<script type="module" src="/src/main.js"></script>
+</body>
+```
+
+
+
+# Plugins
+vue에 전역 수준의 기능을 추가할 때.
+> app.component() 전역 컴포넌트 등록   
+> app.directive() 커스텀 디렉티브 등록   
+> app.provide() 앱 전체에 리소스 주입   
+> app.config.globalProperties 전역 애플리케이션     인스턴스에 속성 또는 메서드 추가   
+
+오브젝트
+```js
+const objPlugins = {
+	install(app, options) {
+		console.log('objPlugins app:', app);
+		console.log('objPlugins options:', options);
+		//app.component() 전역 컴포넌트
+		//app.config.globalProperties 전역 애플리케이션 인스턴스에 속성 추가
+		//app.directive 커스텀 디렉티브
+		//app.provide() 리소스
+	},
+};
+export default objPlugins;
+```
+
+함수로 추가
+```js
+const objPlugins = {
+	install(app, options) {
+		console.log('objPlugins app:', app);
+		console.log('objPlugins options:', options);
+		//app.component() 전역 컴포넌트
+		//app.config.globalProperties 전역 애플리케이션 인스턴스에 속성 추가
+		//app.directive 커스텀 디렉티브
+		//app.provide() 리소스
+	},
+};
+export default objPlugins;
+```
+
+**main.js**
+```js
+..
+import funcPlugins from './plugins/func';
+import objPlugins from './plugins/obj';
+..
+app.use(funcPlugins);
+app.use(objPlugins, { name: '짐코딩' });
+..
+```
+
+# 글로벌 컴포넌트 등록
+
+unplugin-vue-components
+컴포넌트를 자동으로 import해줌
+자동으로 인터페이스 생성.
+```bash 
+npm i unplugin-vue-components -D
+```
+dirs: 자동으로 가져오 길 원하는 컴포넌트의 디렉토리
+dts: components.d.ts에 모든 컴포넌트에 대한 type 자동으로 설정해줌
+
+**vite.config.js**
+```js
+...
+import Components from 'unplugin-vue-components/vite';
+export default defineConfig({
+plugins: [
+	vue(), 
+	Components({ 
+		dts: true, // components.d.ts에 모든 컴포넌트에 대한 type 자동으로 설정해줌
+		dirs: ['src/components/app'] // 특정 컴포넌트만 해당 모듈에서 자동으로 import해오길 원한다면, 자동으로 등록할 컴포넌트의 디렉터리 설정
+})],
+...
+```
+# 커스텀 디렉티브 등록
+v로 시작하는 카멜케이스 변수 - 객체로 정의 - mounted 훅을 이용해 매개변수로 el(엘리먼트)받는다.
+
+**PostForm.vue**
+```js
+<input 
+	v-focus />
+
+...
+
+const vFocus = {
+	mounted: el => {
+		el.focus();
+	},
+};
+```
+--> 페이지에 들어가자마자 input에 포커스됨 동적인 ui에도 잘 동작한다.
+그렇다고 html속성의 autofocus와는 다르다. 동적인 ui가 들어가면 동작하지 않는다. 페이지가 로딩된 시점에서 한 번만 동작된다.
+
+### 일반 script에서 선언하는 방법
+directives 옵션을 사용한다.
+v를 제외하고 이름을 입력한다.
+```js
+<script>
+	export default{
+		setup(){
+
+		},
+		directive:{
+			focus:{
+			}
+		}
+	}
+</script>
+```
+
+### 전역적으로 사용하는 방법
+**main.js**
+```js
+import focus from '@/directives/focus';
+..
+app.directive('focus', focus);
+```
+### Directive Hooks
+디렉티브 정의 객체는 다음과 같은 여러 훅을 사용할 수 있습니다. (모든 훅은 필수가 아닌 선택사항)
+```js
+const myDirective = {
+	// 바인딩된 요소의 속성 전에 호출됨
+	// 또는 이벤트 리스너가 적용됨
+	created(el, binding, vnode, prevVnode) {
+	// 인수에 대한 자세한 내용은 아래를 참조하십시오.
+	},
+	// 요소가 DOM에 삽입되기 직전에 호출됩니다.
+	beforeMount() {},
+	// 바인딩된 요소의 부모 구성 요소가 있을 때 호출됩니다.
+	// 모든 자식이 마운트됩니다.
+	mounted() {},
+	// 상위 컴포넌트가 업데이트되기 전에 호출됨
+	beforeUpdate() {},
+	// 상위 컴포넌트 다음에 호출되고
+	// 모든 자식이 업데이트되었습니다.
+	updated() {},
+	// 상위 컴포넌트가 마운트 해제되기 전에 호출됨
+	beforeUnmount() {},
+	// 상위 컴포넌트가 마운트 해제될 때 호출됩니다.
+	unmounted() {}
+	}
+}
+```
+### Directives Hooks의 매개변수
+
+디렉티브 훅에는 다음과 같은 매개변수가 전달됩니다.
+
+- `el`: 디렉티브가 바인딩된 요소입니다. DOM을 직접 조작하는 데 사용할 수 있습니다.
+- `binding`: 다음 속성을 포함하는 개체입니다.
+    - `value`: 지시문에 전달된 값입니다. 예를 들어 `v-my-directive="1 + 1"`에서 값은 `2`입니다.
+    - `oldValue`: `beforeUpdate` 및 업데이트에서만 사용할 수 있는 이전 값입니다. 값이 변경되었는지 여부에 관계없이 사용 가능합니다.
+    - `arg`: 지시문에 전달된 인수(있는 경우). 예를 들어 `v-my-directive:foo`에서 인수는 `foo`입니다.
+    - `modifiers`: 수정자가 있는 경우 수정자를 포함하는 개체입니다. 예를 들어 `v-my-directive.foo.bar`에서 수정자 객체는 `{ foo: true, bar: true }`입니다.
+    - `instance`: 지시문이 사용되는 구성 요소의 인스턴스입니다.
+    - `dir`: 지시문 정의 개체.
+- `vnode`: 바인딩된 요소를 나타내는 기본 VNode.
+- `prevNode`: 이전 렌더링에서 바인딩된 요소를 나타내는 VNode. `beforeUpdate` 및 `updated` 후크에서만 사용할 수 있습니다.
+예를 들어 다음 디렉티브가 있다고 가정해 보겠습니다.
+
+```jsx
+<div v-example:foo.bar="baz">
+```
+
+`binding` 매개변수는 다음과 같은 형태의 객체입니다.
+
+### 함수로 단축 표현
+**color.js 생성**
+```js
+function color(el, binding) {
+	el.style.color = binding.value;
+}
+
+export default color;
+```
+
+**global-directives.js**
+```js
+import color from '@/directives/color';
+export default {
+	install(app) {
+		app.directive('color', color);
+	},
+};
+```
+
+**PostForm.vue**
+```html
+<input
+	v-color="'blue'"
+/>
+```
+
+### 객체 리터럴
+여러 값이 필요한 경우, 객체를 전달할 수 있다.
+```html
+<div v-demo="{ color:'white', text:'hello' }"></div>
+```
+```js
+app.directive('demo', (el, binding) =>{
+	console.log(binding.value.color) // "white"
+	console.log(binding.value.text) // "white"
+}) 
+```
+
+### 컴포넌트에서 커스텀 디렉티브 사용
+> 커스텀 디렉티브가 컴포넌트에서 사용되면 Non-Props 속성과 유사하게 루트 노드에 적용됨.
+> 다중 루트 컴포넌트면 x
+> v-bind="$attrs" 전달 x
+> 권장하지 않는 작업방식이다.
+
+### dayjs 플러그인
+
+dayjs('0000-00-00').format('')
+```bash 
+npm i dayjs
+```
+**dayjs.js 생성**
+```js
+import dayjs from 'dayjs';
+export default {
+	install(app) {
+		app.config.globalProperties.$dayjs = dayjs;
+		app.provide('dayjs', dayjs); //provide로 데이터 내보냄
+	},
+};
+```
+**main.js에 선언**
+```js
+import dayjs from './plugins/dayjs';
+...
+app.use(dayjs);
+```
+
+**사용**
+
+- 단순하게 템플릿 안에서 쓸 경우
+```html
+<p>{{ $dayjs(post.createdAt).format('YYYY. MM. DD. HH:mm:ss') }}</p>
+```
+
+- 스크립트 내에서 함수를 써야하는 경우
+inject로 받고, props로 데이터를 받는다.   
+```js
+<p>{{ createdDate }}</p>
+...
+const dayjs = inject('dayjs');
+const createdDate = computed(() =>
+	dayjs(props.createdAt).format('YYYY. MM. DD HH:mm:ss'),
+);
+```
+
+# Composable
+composition API를 활용하여 상태 저장 로직을 캡슐화,재사용
+
+함수가 루트컴포넌트, 자식컴포넌트에 동시에 생성되면 동작이 안되는 경우가 있다. 그래서 중앙에서 관리하는 상태 관리 시스템이 필요하다.
+
+# axios 컴포저블 함수 구현
+데이터를 성공적으로 조회했을 때 - 목록 ui 출력
+실패 - error 출력
+딜레이 - Loading 출력

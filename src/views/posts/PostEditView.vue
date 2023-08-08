@@ -1,37 +1,26 @@
 <template>
-	<div>
+	<AppLoading v-if="loading" />
+	<AppError v-else-if="error" :message="error.message" />
+	<div v-else>
 		<h2>게시글 수정</h2>
 		<hr class="my-4" />
-		<form @submit.prevent="edit">
-			<div class="mb-3">
-				<label for="title" class="form-label">제목</label>
-				<input
-					v-model="form.title"
-					type="text"
-					class="form-control"
-					id="title"
-				/>
-			</div>
-			<div class="mb-3">
-				<label for="contents" class="form-label">내용</label>
-				<textarea
-					v-model="form.content"
-					class="form-control"
-					id="contents"
-					rows="3"
-				></textarea>
-			</div>
-			<div class="pt-4">
+		<PostForm
+			v-model:title="form.title"
+			v-model:content="form.content"
+			@submit.prevent="edit"
+		>
+			<template #actions>
 				<button
 					type="button"
-					class="btn btn-outline-danger me-2"
+					class="btn btn-outline-danger"
 					@click="goDetailPage"
 				>
 					취소
 				</button>
 				<button type="button" class="btn btn-primary">수정</button>
-			</div>
-		</form>
+			</template>
+		</PostForm>
+		<!-- <AppAlert :show="showAlert" :message="alertMessage" :type="alertType" /> -->
 	</div>
 </template>
 
@@ -39,6 +28,10 @@
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { getPostById, updatePost } from '@/api/posts';
+import PostForm from '@/components/posts/PostForm.vue';
+import { useAlert } from '@/composables/alert';
+
+const { vAlert, vSuccess } = useAlert();
 
 const route = useRoute();
 const router = useRouter();
@@ -48,12 +41,18 @@ const form = ref({
 	title: null,
 	content: null,
 });
+const error = ref(null);
+const loading = ref(false);
 const fetchPost = async () => {
 	try {
+		loading.value = true;
 		const { data } = await getPostById(id);
 		setForm(data);
-	} catch (error) {
-		console.error(error);
+	} catch (err) {
+		error.value = err;
+		vAlert(err.message);
+	} finally {
+		loading.value = false;
 	}
 };
 const setForm = ({ title, content }) => {
@@ -65,8 +64,10 @@ const edit = async () => {
 	try {
 		await updatePost(id, { ...form.value });
 		router.push({ name: 'PostDetail', params: { id } });
+		vSuccess('수정이 완료되었습니다.');
 	} catch (error) {
 		console.error(error);
+		vAlert(error.message);
 	}
 };
 
