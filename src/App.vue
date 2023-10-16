@@ -1,14 +1,22 @@
 <template>
-	<TheHeader></TheHeader>
-	<TheView></TheView>
-	<AppAlert :items="alerts" />
+	<div>
+		<TheNav></TheNav>
+		<TheView></TheView>
+	</div>
 </template>
 
-<script setup>
-import TheHeader from '@/layouts/TheHeader.vue';
-import TheView from '@/layouts/TheView.vue';
-import { useAlert } from '@/composables/alert';
-const { alerts } = useAlert();
+<script>
+import TheNav from './components/TheNav.vue';
+import TheView from './components/TheView.vue';
+export default {
+	components: {
+		TheNav,
+		TheView,
+	},
+	setup() {
+		return {};
+	},
+};
 </script>
 
 <style scoped></style>

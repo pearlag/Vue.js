@@ -1,1234 +1,2729 @@
-<sub>실전편도 매일 꾸준히 공부해서 실무에 적용할 수 있도록 해보자! </sub>
 
 # 목차
-1. [VueRouter](#VueRouter) 
-2. [동적 라우트 매칭](#동적-라우트-매칭) 
-3. [id값 다르게 링크 이동](#id값-다르게-링크-이동) 
-4. [404 page Component](#404-page-component) 
-5. [페이지 컴포넌트에 Props 전달](#페이지-컴포넌트에-props-전달) 
-6. [다양한 History 모드](#다양한-history-모드) 
+<sub>vue.js 기본편 강의를 들었지만 어려워서
+자바스크립트 기본편 강의를 들은 후 재수강.
+이번에는 잘 이해해서 실전편까지 넘어가보자!</sub>
+1. [선수학습](#선수학습)   
+2. [초기 설정](#초기-설정)   
+3. [Vue란?](#vue란)   
+4. [컴포넌트 이해하기](#컴포넌트-이해하기)   
+5. [Options API vs Composition API](#options-api-vs-composition-api)
+6. [HTML 클래스 바인딩](#HTML-클래스-바인딩)   
+7. [조건부 렌더링](#조건부-렌더링)   
+8. [목록 렌더링](#목록-렌더링)   
+9. [디렉티브](#디렉티브)   
+10. [이벤트 처리](#이벤트-처리)   
+11. [양방향 바인딩](#양방향-바인딩)   
+12. [Watch WatchEffect](#Watch-WatchEffect)  
+13. [컴포넌트 기초](#컴포넌트-기초)  
+14. [SFC](#SFC)  
+15. [Props](#Props)  
+16. [emit](#emit)  
+17. [Non-Prop 속성](#Non-Prop-속성)  
+18. [Provide()](#Provide())  
+19. [Inject()](#Inject())  
+20. [Lifecycle Hooks](#Lifecycle-Hooks)  
+21. [Template refs](#Template-refs)  
+22. [script setup](#script-setup)  
+23. [동적 컴포넌트](#동적-컴포넌트)  
 
-# VueRouter
-Vue.js를 이용하여 SPA을 구현할 때 사용하는 Vue.js의 공식 라우터.
 
-### Router
-url에 따라 어떤 페이지를 보여줄지 mapping해주는 라이브러리
+# 선수학습✨
 
-```bash
-npm i vue-router
-```
 
-src/views  <sub>페이지들</sub>
-src/components  <sub>재사용할 컴포넌트들</sub>
+### DOM(문서 객체 모델) Document Object Model.
+> 트리 구조(document 안 구조) / 노드(각각의 객체)   
+> document : dom tree 최상위 모델 (dom model진입점) 
 
-### 사용법
-1. \src\router\ **index.js**
-router 정보 설정
+### BOM(브라우저 객체 모델) Browser Object Model.   
+> 브라우저를 제어할 수 있도록 모델링하는것   
+> window - 브라우저 창   
+> document - 문서에 대한 정보 have   
+> history 객체 - url history 제어   
+> location - 문서의 주소와 관련된 객체. 문서 url 변경, 주소에 대한 정보 얻음   
+> screen : 사용자의 화면에 대한 정보   
+> navigator : 실행중인 브라우저에 대한 정보. 위치정보 버전. 이름 앱..    
+
+### 자바스크립트 파일을 효과적으로 가져오는 법   
+> html parsing ------script fetch--------script execution-----------→ ( X )   
+> 동기처리로, 시간이 걸리고, 순서가 애매할수 있다.   
+>   
+> html parcing ----------→ script fetch + script execution  ( O )   
+> 이 방법도 문제가 있다. 
+
+#### defer로 해결할 수 있다. *일반적으로 사용함*   
+> script 선언에  defer 속성을 선언해주면 된다.   
+> html 파싱과 함께 비동기로 js파일을 불러온다.   
+> html 파일을 불러온 후 script execution 진행한다.   
+> 즉,   
+> html parsing -------script fetch(비동기)-------→(파싱 끝난후)script execution      
+
+#### async 속성 *꼭 필요할때 사용함.*
+> html 파싱과 함께, 비동기로 js 파일을 불러온다.   
+> html 파싱이 완료되지 않았더라도 먼저 로딩되는 js파일부터 실행이 된다.   
+> js 파일을 실행할때는 html 파싱이 중단된다.   
+> html parsing -------script fetch(비동기)-------→script execution(html 파싱 중지) ---→(다시 파싱)   
+
+### this
+> ES5 bind 메서드   
+> 한 번만 사용할 수 있다.   
+> 전역스코프에서 this는 window 객체다.   
+> 화살표 함수는 자신을 감싸는 외부 스코프의 this를 물려받는다.  
+>  >  객체 메서드를 선언할 때 사용하면 안됨.   
+>  >  addEventListener 함수의 콜백함수에서 사용하면 안됨.    
+> <b>엄격 모드(use strict)</b>에서는 호출한 놈이 없을 경우 기본값이 window가 아니라 undefined가 된다.
 ```js
-'vue-router';
-import Homeview from '@/views/HomeView.vue';
-import AboutView from '@/views/AboutView.vue';
+function printThis(){
+  console.log(this);
+}
 
-const routes = [
-	{
-		path: '/',
-		name: 'Home',
-		component: Homeview,
-	},
-	{
-		path: '/about',
-		name: 'About',
-		component: AboutView,
-	},
-];
+let person1 = {
+  name = '홍길동',
+};
 
-const router = createRouter({
-	history: createWebHistory('/'),
-	routes,
-});
+let printThis1 = printThis.bind(person1);
+printThis();
 
-export default router;
+// {name: '홍길동'} 
 ```
 
-2. \src\ **main.js**
-app.use(router) 호출
+### API란 무엇인가?
+> 응용 프로그램에서 소통하기 위한 접점   
+> 애플리케이션에서 데이터를 읽거나 쓰기 위해 사용하는 인터페이스.   
+> #### HTTP API(통신 방법)   
+> * Private API(사내 API)   
+> * Public API(Open API)   
+
+### 동기
+> 답변을 기다리는 것(blocking)   
+> 업무가 단순하다 but 자원 비효율적 사용   
+
+### 비동기   
+> 답변을 기다리지 않는 것(Non-blocking)   
+> 대신, 결과를 확인할 수 없다.   
+> 자원 효율적 사용 가능함.
+> 업무가 복잡함.   
+
+### 이벤트 전파   
+> 캡쳐링   
+> 최상위 요소부터 하위 요소까지 이벤트 전파   
+
+
+> 버블링   
+> 타겟 요소부터 이벤트가 전파되어 최상위 요소까지 올라가는 것   
 ```js
-import router from '@/router';
-
-createApp(App).use(router).mount('#app');
+event.stopPropagation(); // 이벤트 전파 멈춤.
+event.preventDefault();  // 기본 기능을 막음(ex. 앵커태그)
 ```
 
-3. 모든 자식 컴포넌트에 router, route 객체 사용가능.
-
-
-### RouterLink = a태그 대신 사용.
-> 페이지를 리로딩하지 않고, url매핑된 페이지 렌더링   
-> 페이지 이동시 깜빡거림이 없고, 로딩시간이 거의 없다.   
-> **active-class** : 활성화된 상태에서 추가하는 class 설정 가능.   
-> **v-slot** 속성 사용 가능.  
-> **to=""**  단순하게는  to="" 안에 이동할 url을 넣는다. 더 효율적인 방법은 아래에.    
+### Array API
+#### map()
+> 주어진 결과물이 리턴한 결과를 새로운 배열로 반환한다.   
 ```html
-<router-link class="nav-link" active-class="active" to="/">Home</router-link>
+<script type="module" src="./main.js"></script>
 ```
 
-### $route 내장객체
-> **useRouter** import하고,    
-> **$route**로 현재 페이지에 대한 정보를 접근할 수 있다.
+```js:
+//main.js
+'use strict'; // 엄격 버전
+
+class Student{
+constructor(name, kr, en, math){
+    this.name = name;
+    this.kr = kr;
+    this.en = en;
+    this.math = math;
+  }
+}
+
+const student1 = new Student("쯔위", 95, 87, 75);
+const student2 = new Student("미나", 75, 22, 22);
+const student3 = new Student("채영", 45, 100, 65);
+const student4 = new Student("나연", 11, 50, 75);
+
+const students = [student1, student2, student3, student4];
+
+const result = numbers.map((number) => number * 2);
+console.log(
+"영어 점수"
+students.map((student) => student.en)
+);
+
+// 영어 점수 (4) [87, 22, 100, 50] 
+```
+
+#### some()
+> 요소를 한 번씩 순회하며, 주어진 함수가 한 번이라도 true가 나오면 true를 반환한다.   
+```js
+const fruits = ["사과", "딸기", "배", "참외];
+fruits.some((fruit) => fruit === "배"; )
+
+const numbers = [1, 2, 3, 4, 5, 6, 7];
+numbers.some((number) => number >= 8)
+```
+
+#### every() 
+> 배열 안의 모든 요소가 true일때 true 반환한다.   
+
+#### filter() 
+> 필터링 한 요소는 제거하고 새로운 배열을 만든다.   
+```js 
+numbers.filter((number) => number % 2 === 0) 
+```
+
+#### reduce(acc누적값, cur현재값, idx인덱스, src원본) 
+> 누적값: 결과로 반환한 값을 다시 매개변수로 넣는다.   
+> 현재값: 배열 안에 있는 요소   
+> 인덱스: 배열의 인덱스   
+
+#### 모듈 시스템 
+> 분리된 js파일(모듈)과 그것을 불러오는 시스템(import)   
+#### 장점
+* 유지보수 용이   
+* 네임스페이스화   
+* 재사용성   
+
+#### 종류
+* AMD   
+* CommonJS   
+* UMD  
+* ES Modul   
+
+#### ES Module 방식(scss 파일 나누는거랑 똑같음) 
+1. package.json에서 ```"type" : "module"``` 선언
+2. script 태그에 ```type="module"``` 속성을 추가하면, 이 파일은 모듈로서 동작한다.
+3. 외부에서 불러올 때는 import를 사용한다. ```@import{ 함수명, 함수명, 함수명 } from './math.js';```
+4. js파일에서 ```export default 함수명;``` 선언하면 부모 js 디렉티브에서 바로 받아올 수 있다. ```import 함수명 from './math.js'```
+5. 모아서 default 선언할수도 있다.
+```js:
+// math.js
+// 위에서 sum, avg, subtract 변수를 선언한 상태
+export default{
+  sum,
+  avg,
+  subtract
+}
+```
+```js
+//index.js
+import math from './math.js'
+
+comsole.log(math.sum);
+comsole.log(math.avg);
+comsole.log(math.subtract);
+```
+
+#### CommonJS 방식 
+> exports.함수명   
+> modules
+
+#### NPM node package manager 
+> npm(모듈 모음)   
+> 설치하는 방법 : npm install 모듈명   
+> devDependencies : 개발할 때 필요한 라이브러리    
+> dependencies : 운영할 때 필요한 라이브러리   
+#### 명령어
+> 기본값 입력 ```npm init -y```    
+> 특정 버전 설치는 @+버전```npm i ajs@1.10.7```   
+> devDependencies에만 다운로드 ```npm i --save-dev```   
+> 전역 설치 ```-g```
+
+#### WebPack 기초 
+> 모듈 증가 -> 로딩 시간 증가   
+> 시간 줄이는 방법 : http 갯수를 줄인다.   
+> 배포하기 전, 여러 개의 파일을 하나의 파일로 줄인다.(번들링) / 모듈 번들러로 작업한다. (웹팩)   
+> 웹팩 설치 ```npm i --save-dev webpack webpack-cli```   
+> ```npx webpack --entry ./index.js```index.js를 기준으로 번들링하겠다.    
+> ```--output-path ./dist```dist 폴더 안에 번들링 결과 파일을 저장함. 압축되어 생성하겠다.   
+> ```--mode development```압축 없이 생성하겠다.   
+> <a href="webpack.js.org/guides/asset-management" target="_blank">셋팅 참고</a>   
+
+#### webpack.config.js 파일 설정
+> ```npx webpack```명령어 입력시 webpack.config.js를 참고하여 번들링한다.   
+> packages.json - script에   
+> > ```"build" : "webpack"``` 셋팅 추가.   
+> > 터미널에 ```npm run build``` 하면 webpack 실행.   
+> > js 뿐만 아니라 image, css도 번들링한다.   
+```js
+// webpack.config.js
+const path = require('path');
+
+module.exports = {
+mode : 'production' // development(압축 x) 
+entry : 진입점을 설정한다.
+output:{ 
+    path: 번들링 파일을 저장할 경로
+    filename : 파일 이름
+  }
+}
+```
+
+
+
+
+
+# 초기 설정✨
+## 로컬 저장소 - git 원격 저장소 연결
+> git config --global user.email "이메일"   
+> git config --global user.name "닉네임"   
+> git init   
+> git add .   
+> git commit -m ""   
+> git remote add origin '원격저장소 주소'   
+> git push -u origin master   
+
+## VScode 확장 프로그램 설치
+> indent-rainbow   
+> Auto Rename Tag   
+> css peek   
+> HTML to CSS autocompletion   
+> HTML CSS Support   
+> Live server   
+> ESLint   
+> Volar   
+> Vue VSCode Snippets (SFC 빠르게 생성 가능)   
+
+## chrome extension
+> Vue.js devtools    
+
+## vue 셋팅_직접 셋팅
+### 터미널
+> npm init -y   
+> npm i vue vite @vitejs/plugin-vue  
+
+### vite.config.js 셋팅
+> 루트에 ```vite.config.js``` 생성   
+> <a href="https://github.com/vitejs/vite-plugin-vue/tree/main/packages/plugin-vue">vite 공식문서</a>참고하여 내용 복붙   
+### package.json 셋팅
+> script에 "dev" : "vite"추가.   
+> npm run dev로 local server ON!
+### main.js 셋팅
+```js
+import { createApp } from 'vue' // 추가
+import App from './App.vue'
+import AppHeader from './components/AppHeader.vue'
+import AppNav from './components/AppNav.vue'
+import AppView from './components/AppView.vue'
+import BookComponent from './components/BookComponent.vue'
+
+const app = createApp(App); // 수정 :: Vue.createApp ->createApp
+app.component('AppHeader', AppHeader);
+app.component('AppNav', AppNav);
+app.component('AppView', AppView);
+app.component('BookComponent', BookComponent);
+
+app.mount('#app');
+
+```
+### style 분리 및 App.vue 셋팅
+> html에 있던 css를 ```asset/base.css```로 분리.   
+> 컴포넌트의 제일 상위에 있는 App.vue의 style블럭에 import해오기.  
+```vue
+<style>
+@import './asset/base.css';
+</style>
+```
+
+## Vue 셋팅_자동화
+### 터미널
+> npm init vue 
+> > 프로젝트 네임 정하기   
+> > 모두 No로 하고, ESLint와 Prettier는 YES로 진행
+> > 프로젝트 폴더가 생성된다.
+> 프로젝트 폴더로 이동   
+> npm i   
+> npm run dev
+> 프로젝트 폴더 구조가 셋팅되었다!
+### vite.config.js
+alias: 단축 url 지정. 
+### 자동화로 구성된 폴더 구조에 대하여
+> public: 정적 자산   
+> src/assets: webpack이나 vite와 같은 빌드 도구의 영향을 받는 images나 css와 같은 정적 자산을 놓는 곳.   
+> src/App.vue: 루트 컴포넌트.   
+> > ```index.html``` -> ```main.js``` 렌더링    
+> > ```import { createApp } from 'vue' ```  createApp는 뷰 인스턴스를 생성하는 메서드.    
+> > ```import App from './App.vue'```루트 컴포넌트인 APP가 메서드 안에 들어감.   
+> > ```createApp(App).mount('#app')``` 생성된 뷰 인스턴스는 #app에 마운트됨.    
+> > 루트 컴포넌트가 렌더링 됨. 
+### .eslintrc.cjs - ESLint 셋팅
+#### plugin:vue/vue3-essential
+> .eslintrc.cjs에 이미 설정된 것은 <a href="v3.ko.vuejs.org/style-guide" target="_blank" >스타일가이드 공식문서</a>에서 정의된 필수 요소(essential)만 추가된 것.   
+#### eslint:recommended
+> <a href="eslint.org/docs/rules" target="_blank" >eslint 공식문서</a>에 checked된 항목만 자동으로 검사하는 옵션.   
+#### @vue/eslint-config-prettier/skip-formatting
+> 충돌 방지용 패키지
+### .eslintrc.cjs - prettier 셋팅
+<a href="https://prettier.io/docs/en/options.html" target="_blank">prettier 공식문서</a>에서 Options 볼 수 있음.
+
+```cjs
+rules: {
+  'prettier/prettier': [
+    'error',
+    {
+      singleQuote: true,
+      semi: true,
+      useTabs: true,
+      tabWidth: 2,
+      trailingComma: 'all',
+      printWidth: 80,
+      bracketSpacing: true,
+      arrowParens: 'avoid',
+    },
+  ],
+},
+```
+
+### rules 셋팅을 자동으로 파일에 수정저장 하는법
+1. 설정 - 작업 영역 - eslint - Eslint: Validate
+2. settings.json
+```js,
+{
+  "eslint.validate": [
+      "javascript",
+      "javascriptreact",
+      "typescript",
+      "typescriptreact",,,,
+      // "html",  // 삭제
+      "vue",
+      "markdown"
+  ],
+  "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+  },
+  "editor.tabSize": 2,
+}
+```
+3. npm run lint
+
+4. 설정에서 format on Save 삭제
+
+
+
+
+# Vue란?✨
+> UI 개발을 위한 자바스크립트 프레임워크.   
+> html 셋팅후 <script src="https://unpkg.com/vue@next"></script> 추가.   
+> js에서는 데이터 바인딩을 하려면 돔 객체를 가져와서 넣어주고 함수를 만들어야 하는데, vue에서는 선언만 하면 된다.   
+> 선언적 렌더링: 템플릿 구문을 이용하여 데이터를 출력.   
+> 반응성 : 상태 변경을 자동으로 추적하여 자동 업데이트.   
+> v- 를 <b>디렉티브</b>라고 한다.
+
+## 바인딩(v-bind)
+> 엘리먼트 속성에 데이터를 바인딩할 수 있다.   
+> 반응형 동작. 최신 상태를 유지한다.   
+> 값 연결. data 값 변경 -> value 변경 <b>단방향</b>
+
+## 이벤트 핸들링(v-on)
+> 사용자가 앱과 상호 작용할 수 있게 하기 위해 v-on 디렉티브를 사용하여 Vue 인스턴스의 메소드(methods)를 호출하는 이벤트 리스너를 추가 할 수 있습니다.   
+> 이 방법은 직접적으로 DOM(p 엘리먼트)을 건드리지 않고 앱의 상태만 업데이트 합니다.
+
+## 양방향 바인딩(v-model)
+> v-bind는 단방향이라 data값이 변경되면 value값이 변경되지만, <b>반대로 </b>value값 변경시 data값은 변경되지 않는다.   
+> value 변경시에 상태값도 변경하고 싶다면 v-model을 사용한다.   
+
+## 조건문(v-if)
+> 엘리먼트 표시여부는 v-if 특수 속성(디렉티브)으로 제어할 수 있습니다.   
+
+## 반복문
+> 배열에서 데이터를 가져와 아이템 목록을 표시하는데 사용할 수 있습니다.   
+
+
+## 예제
+```html
+<div id="app">
+  <input type="text" v-bind:placeholder="message" />
+  <hr />
+  <button v-on:click="reverMessage">click</button>
+  <hr />
+  <input type="text" v-model="username" />
+  <hr />
+  <p v-if="visible">보이나요?</p>
+  <button type="button" v-on:click="visible = true">visible</button>
+  <hr />
+  <ul>
+      <li v-for="item in items">{{ item }}</li>
+  </ul>
+</div>
+```
+```js
+const app = Vue.createApp({
+  data() {
+      return{
+          message: '값 입력',
+          username: '진주은',
+          visible: false,
+          items: ['사과', '포도', '딸기']
+      }
+  },
+  methods:{
+      hello(){
+          alert('hello');
+      },
+      reverMessage(){
+          this.message = this.message.split('').reverse().join("");
+      }
+  }
+})
+app.mount('#app');
+```
+
+# 컴포넌트 이해하기✨
+> 모듈 : js를 재사용할 수 있도록 분리한 것.   
+> 컴포넌트 : ui를 재사용할 수 있도록 정의하다    
+> 반복되는 코드를 <b>컴포넌트</b>로 만들면 편리하다.
+> 실무에선 주로  SFC를 사용한다.   
+> 네이밍은 ```PascalCase``` or ```kebab-case```
+
+## 컴포넌트 만들기
+> 컴포넌트 정의 -> 컴포넌트 등록(지역/전역) -> 컴포넌트 사용
+
+## 컴포넌트 만들기_문자열 템플릿
+1. html에 반복되는 부분(또는 컴포넌트를 만들고 싶은 부분)을 찾는다.
+ ```html
+ <section>
+    <article class="book">
+        <div class="book_subtitle">제목</div>
+        <div class="book_title">title</div>
+    </article>
+    <!-- 
+      이게 무려 5개가 있음..
+    -->
+  </section>
+ ```   
+2. 변수로 템플릿 정의 + 하단에 컴포넌트 명과 컴포넌트 등록하기.
+ ```js
+ const BookComponent = {
+    template: `
+      <article class="book">
+          <div class="book_subtitle">제목</div>
+          <div class="book_title">title</div>
+      </article>
+    `,
+  };
+  const app = Vue.createApp({});
+  app.component('BookComponent', BookComponent);
+  app.mount('#app');
+ ```
+3. html에서 템플릿 불러오기
+```html
+<div id="app">
+  <main>
+      <section>
+        <book-component></book-component>
+        <book-component></book-component>
+        <book-component></book-component>
+        <book-component></book-component>
+      </section>
+  </main>
+</div>
+```   
+4. 루트 컴포넌트 생성
+* ui를 컴포넌트화 한다.   
+* App에 템플릿을 다 정의해서 담아준다.   
+* 하단 루트 컴포넌트 생성 옵션에 App을 담아준다.   
+* html에 ```<div id="app"></div>``` 만 정의해도 ui가 다 나온다.   
+```html
+<style>
+*{margin:0;padding:0;}
+header{width:100%;height:40px;background-color: #eee;padding:20px;}
+nav{display:inline-block;padding: 10px;background-color: #ccc;height: 100vh;width:200px}
+main{display: inline-block;vertical-align: top;}
+section{display: flex;gap:20px;margin:20px;}
+.book{flex-basis: 10%;padding:10px;border:1px solid red;border-radius: 5px;}
+.book_subtitle{text-align: center;}
+.book_title{text-align: center;font-weight: bold;font-size: 30px;}
+</style>
+<body>
+<div id="app"></div>
+<script>
+  const App = {
+    template: `
+    <app-header></app-header>
+    <app-nav></app-nav>
+    <app-view></app-view>
+    `
+  }
+  const AppHeader = {
+    template: `
+      <header>
+        <h1>header</h1>
+      </header>
+    `,
+  };
+  const AppNav = {
+    template: `
+      <nav>
+        <ul>
+          <li><a href="#none">메뉴1</a></li>
+          <li><a href="#none">메뉴2</a></li>
+          <li><a href="#none">메뉴3</a></li>
+          <li><a href="#none">메뉴4</a></li>
+          <li><a href="#none">메뉴5</a></li>
+        </ul>
+      </nav>
+    `
+  };
+  const AppView = {
+    template: `
+      <main>
+          <section>
+            <book-component></book-component>
+            <book-component></book-component>
+            <book-component></book-component>
+            <book-component></book-component>
+          </section>
+      </main>
+    `
+  }
+  const BookComponent = {
+    template: `
+      <article class="book">
+          <div class="book_subtitle">제목</div>
+          <div class="book_title">title</div>
+      </article>
+    `,
+  };
+
+const app = Vue.createApp(App); //루트 컴포넌트 생성 옵션
+app.component('AppHeader', AppHeader);
+app.component('AppNav', AppNav);
+app.component('AppView', AppView);
+app.component('BookComponent', BookComponent);
+
+app.mount('#app');
+</script>
+</body>
+</html>
+```   
+5. 컴포넌트를 파일로 나누기
+* ```src/App.js```   
+* ```src/components/AppHeader.js``` 등등 UI 나눈것 넣기   
+* js파일 안에는 ```export defalt{}``` 블럭 안에 템플릿 정의한 내용을 넣는다.    
+```js
+export default{
+  template: `
+    <app-header></app-header>
+    <app-nav></app-nav>
+    <app-view></app-view>
+  `
+}
+```
+* ```src/main.js``` 파일을 만들고 html파일에서 component 정의한 내용을 넣어준다.
+* 상단에는 나눠놓은 컴포넌트를 ```@import```로 불러온다.
+```js
+import App from './App.js'
+import AppHeader from './components/AppHeader.js'
+import AppNav from './components/AppNav.js'
+import AppView from './components/AppView.js'
+import BookComponent from './components/BookComponent.js'
+
+
+const app = Vue.createApp(App); //루트 컴포넌트 생성 옵션
+app.component('AppHeader', AppHeader);
+app.component('AppNav', AppNav);
+app.component('AppView', AppView);
+app.component('BookComponent', BookComponent);
+
+app.mount('#app');
+```
+
+* 루트 디렉토리 index 파일의 script를 모두 지우고 main.js를 모듈  타입으로 불러온다.
+```<script type="module" src="./src/main.js"></script>```
+
+## 컴포넌트 만들기_SFC
+> 확장자 .vue를 갖는다.   
+> 문자열 템플릿에서 ```template: `~~` ``` 안에 있던 태그를 그대로 ```<template></template>``` 안에 넣는다.      
+> js 코드는 ```export default{}```안에 넣는다.     
+> style 태그는 ```<style></style>```안에 넣는다.    
+> html, js, css가 ```캡슐화```되어있다.   
+```vue
+<!-- 기본 구조 -->
+<template>
+  <header>
+    <h1>header</h1>
+  </header>
+</template>
+<script>
+export default {
+}
+</script>
+<style>
+</style>
+```
+
+# Options API VS Composition API ✨
+## Options API (vue2)
 ```vue
 <template>
 	<div>
-		<h2>About View</h2>
-		<p>{{ $route.path }}</p><!-- /about -->
-		<p>{{ $route.name }}</p><!-- About -->
+		<button v-on:click="increment">counter: {{ counter }}</button>
 	</div>
 </template>
 
-<script setup>
-import { useRouter } from 'vue-router';
-
-const route = useRouter();
-console.log('route.path', route.path);
-</script>
-```
-
-
-### 링크 이동하는 방법들
-
-1. $router에 push
-```html
-<button class="btn btn-primary" @click="$router.push('/')">Home Go</button>
-```
-
-2. 변수에 함수로 담기
-```html
-<button class="btn btn-primary" @click="goAboutPage()">About Go</button>
-...
-
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
-const goAboutPage = () => {
-	router.push('/about');
-};
-```
-3. 라우트 name으로 이동(권장)
-```html
-<button	@click="goDetailPage">취소</button>
-..
-
-<script setup>
-import { useRoute, useRouter } from 'vue-router';
-
-const route = useRoute();
-const router = useRouter();
-const id = route.params.id;
-
-const goDetailPage = () => {
-	router.push({
-		name: 'PostDetail',
-		params: { id },
-	});
-};
-</script>
-```
-
-
-### 라우트 name 설정
-index.js
-```
-const routes = [
-	{
-		path: '/',
-		name: 'Home',
-		component: Homeview,
+<script>
+export default {
+	data() {
+		return {
+			counter: 0,
+		};
 	},
-	{
-		path: '/about',
-		name: 'About',
-		component: AboutView,
-	},
-];
-```
-
-
-# 동적 라우트 매칭
-```path: '/posts/:id'```
-> 동적 url이다. 
-> 유저마다 다른 여러 개의 url을 하나의 페이지에 매핑.    
-```{{ $route.params }}```
-> **params**의 값은 route에서 설정한 path에서 '**:id**' 이 부분!   
-> 만약 ':abc'로 했으면 abc로 나옴.   
-
-
-### query <sub>/users?</sub>
-```
-#route.query 
-/users?searchText=love
-query: { searchText: love }
-```
-
-### hash <sub>/users/#</sub>
-```
-$route.hash
-/users/#profile
-hash: { profile }
-```
-
-ex)
-/posts/ddd?searchText=Vue3bible#profile
-```html
-<p>params: {{ $route.params }}</p>
-<p>query: {{ $route.query }}</p>
-<p>searchText: {{ $route.query.searchText }}</p>
-<p>hash: {{ $route.hash }}</p>
-..
-
-//출력
-params: { "id": "ddd" }
-query: { "searchText": "Vue3bible" }
-searchText: Vue3bible
-hash: profile
-```
-
-/posts/ddd#hashvalue
-```html
-<p>hash: {{ $route.hash }}</p>
-...
-//출력
-hash: #hashvalue
-```
-
-
-
-### ui 컴포넌트 파악하기
-1. grid시스템 살펴보기
-2. 사전에 정의해놓은 class들(help-class) 살펴보기
-
-
-
-# id값 다르게 링크 이동
-1. 하드코딩
-```js
-@click="goPage(post.id)"
-...
-const goPage = id => {
-	router.push(`/posts/${id}`);
-};
-```
-2. 이름을 가지는 라우트
-```js
-@click="goPage(post.id)"
-...
-const goPage = id => {
-	router.push({
-		name: 'PostDetail',
-		params: {
-			id,
+	methods: {
+		increment() {
+			this.counter++;
 		},
-	});
-};
-```
-
-3. 쿼리, 해쉬와 함께 사용
->	/posts/1?searhText=hello#world	
->	/posts/2?searhText=hello#world 	
-> ...   
-```js
-router.push({
-  name: 'PostDetail',
-  params: {
-    id,
-  },
-  query: {
-    searhText: 'hello',
-  },
-  hash: '#world',
-});
-```
-
-# 404 page Component
-엉뚱한 url로 이동했을 때 이동할 페이지를 설정한다.   
-index.js
-```js
-const routes = [
-	{
-		path: '/:pathMatch(.*)*',
-	// path: '/user-:afterUser(.*)', 특정 문자열 뒤에 정규식 표현할 때
-		name: 'NotFound',
-		component: NotFoundView,
 	},
-];
+	mounted() {
+		console.log('컴포넌트가 마운트되었습니다.');
+	},
+};
+</script>
+
+<style scoped></style>
+```
+> data, methods, mounted 옵션에 따라 나눠놓음.
+> 논리적 관심사를 처리하는 코드가 분산되어 있어 분석이 어렵다.
+
+## Composition API (vue3)
+```vue
+<template>
+	<div>
+		<button v-on:click="increment">counter: {{ counter }}</button>
+	</div>
+</template>
+
+<script>
+import { onMounted, ref } from 'vue';
+export default {
+	setup() {
+		const counter = ref(0);
+		const increment = () => counter.value++;
+		onMounted(() => {
+			console.log('컴포넌트가 마운트되었습니다.');
+		});
+		return {
+			counter,
+			increment,
+		};
+	},
+};
+</script>
+
+<style scoped></style>
+
+```
+> setup 함수 안에 논리적 관심사대로 그룹핑해놓음. 분석이 쉽다.   
+> >  counter.js / book.js.. 이렇게 파일을 나눠놓기 좋음. 
+> > <b>재사용(Composable) 유용</b>. Options API의 Mixin 사용 안해도 됨.     
+> 옵션을 선언하는 대신에 가져온 함수(ref, onMouted ,,)를 사용하여 Vue 컴포넌트를 작성할 수 있는 API 세트이다.   
+> <a href="vuejs.org/api" target="_blank">api 공식문서</a>   
+
+### 반응형 API (Reactivity API)
+반응하는 데이터와 관련된 API 세트.
+* ```ref()```
+* ```isRef()``` 반응형 데이터인지 검사하는 api.
+* 아래 예시는 ref()를 활용하여 btn 클릭시 '!'를 추가하는 로직이다.
+* 반응형 데이터와 일반 데이터의 로직을 비교해보길.
+```vue
+<template>
+	<div>
+		<h2>반응형 메시지</h2>
+		<p>{{ reactiveMessage }}</p>
+		<button v-on:click="addReactiveMessage">Add Message</button>
+		<h2>일반 메시지</h2>
+		<p>{{ normalMessage }}</p>
+		<button v-on:click="addNormalMessage">Add Message</button>
+	</div>
+</template>
+
+<script>
+import { ref, isRef } from 'vue';
+export default {
+	setup() {
+		const reactiveMessage = ref('Hello Reactive Message');
+		const addReactiveMessage = () => {
+			reactiveMessage.value = reactiveMessage.value + '!';
+		};
+		//반응형 데이터 유무 검사
+		console.log('isRef(reactiveMessage):', isRef(reactiveMessage));
+		// true
+
+		let normalMessage = 'Hello Normal Message';
+		const addNormalMessage = () => {
+			normalMessage = normalMessage + '!';
+		};
+		//반응형 데이터 유무 검사
+		console.log('isRef(normalMessage):', isRef(normalMessage));
+		// false
+
+		return {
+			reactiveMessage,
+			normalMessage,
+			addReactiveMessage,
+			addNormalMessage,
+		};
+	},
+};
+</script>
 ```
 
-### 중첩된 라우트
-> nav에서 선택된 메뉴의 컨텐츠가 이미 보여지고 있는데   
-> 그 컨텐츠에 또 탭이 있어서 그 탭에 해당되는 컨텐츠가 보여져야할 때.  
+### 라이프 사이클 훅(Lifecycle Hooks)
+#### 라이프 사이클
+Vue 인스턴스나 컴포넌트가 생성될 때 거치는 과정.
+#### 라이프 사이클 훅
+라이프사이클 단계에서 실행되는 함수.
 
-1. 부모 컴포넌트에 ```<router-view></router-view>```를 넣는다.
+### setup()
+컴포넌트가 생성되기 이전에 실행되는 Hook.
+#### 사용법
+1. 반응형 상태를 선언한다.
 
-2. 라우트 설정에서 부모 컴포넌트 안에 children 속성을 넣어, 딸린 페이지들을 연결한다.
-```js
-{
-	path: '/Nested',
-	name: 'Nested',
-	component: NestedView,
-	children: [
-		{
-				path: '', // /Neseted 페이지, 즉 기본 페이지
-				name: 'NestedHome',
-				component: NestedHomeView,
+```vue
+import { ref } from 'vue'
+export default{
+  setup(){
+    const count = ref(0)
+    
+    return{
+      count
+    }
+  }
+}
+```
+2. 템플릿에서 쓴다.
+```vue
+<template>
+  <button @click="count++">{{ count }}</button>
+</template>
+```
+2. 컴포넌트 인스턴스에서 사용한다. <br />
+```this``` 키워드로 접근 가능하다.
+```vue
+...
+  setup(){
+    ...
+  },
+  mounted(){
+    console.log(this.count)
+  }
+...
+```
+
+#### Props 접근
+> setup()의 첫 번째 매개변수이다.   
+> 반응형 객체이다.   
+```vue
+export default{
+  props:{
+    title: String
+  },
+  setup(props){
+    console.log(props.title)
+  }
+}
+```
+
+#### Setup Context
+> setup(props, context)   
+> > context.attrs   
+> > context.slot   
+> > context.emit   
+> > context.expose
+또는 ```setup(props, {attrs, slots, emit, expose})```
+
+
+### 종속성 주입(Dependency Infection)
+
+### 템플릿 문법
+이중 중괄호를 사용해 데이터에 바인딩할 수 있다.   
+
+#### ```v-once``` 데이터가 변경되어도 갱신하지 않는 일회성 보간.
+```vue
+<p v-once>문자열: {{ message }}</p>
+```
+```vue
+<template>
+	<div>
+		<h2>보간법</h2>
+		<p>{{ message }}</p>
+		<p v-once>{{ message }}</p>
+		<button @click="message = message + '!'">click!</button>
+	</div>
+</template>
+
+<script>
+import { ref } from 'vue';
+export default {
+	setup() {
+		const message = ref('안녕하세요!');
+		return {
+			message,
+		};
+	},
+};
+</script>
+
+```
+
+#### ```v-html``` <br />  
+> 실제 HTML을 출력하려면 ```v-html``` 디렉티브를 사용한다.   
+> XSS 취약점으로 이어질 수 있어, 신뢰할 수 있는 콘텐츠에서만 사용한다.   
+```html
+<p v-html="rawHtml"></p>
+
+``` 
+#### ```v-bind``` 속성 바인딩
+v-bind / :
+```vue
+<template>
+  <div v-bind:title="dynamicTitle">마우스를 올려보세요</div>
+
+  <!-- 단축 속성 -->
+  <div :title="dynamicTitle">마우스를 올려보세요</div>
+</template>
+
+<script>
+import { ref } from 'vue';
+export default {
+  setup() {
+    const dynamicTitle = ref('안녕하세요~~');
+    return {
+			dynamicTitle,
+		};
+  },
+};
+</script>
+```
+<br />
+
+여러 개의 속성을 한꺼번에 바인딩할 수 있다.  
+```vue
+<template>
+  <input v-bind="attrs" />
+
+  <!-- 단축 속성 -->
+  <input :="attrs" /> 
+</template>
+
+<script>
+import { ref } from 'vue';
+export default {
+  setup() {
+    const attrs = ref({
+			type: 'password',
+			value: '12345',
+			disabled: false,
+		});
+    return {
+			attrs,
+		};
+  },
+};
+</script>
+```
+
+<br />
+자바스크립트 표현식을 출력할 수도 있다.
+
+```vue
+
+<template>
+ {{ message.split('').reverse().join('') }}<!-- !요세하녕안 --> <br />
+  {{ isInputDisabled ? '예' : '아니오' }}<!-- 예 -->
+</template>
+
+```
+
+##### v-bind in css
+SFC style태그는 v-bind css 기능을 사용하여, css 값을 동적으로 변경할 수 있다.
+```vue
+<template>
+	<h5 class="red">Card title</h5>
+</template>
+<script>
+import { ref } from 'vue';
+
+export default {
+	setup() {
+		const color = ref('red');
+		color.value = 'yellow';
+		return { color };
+	},
+};
+</script>
+
+<style>
+.red {
+	color: v-bind(color);
+}
+</style>
+
+```
+
+
+### 반응형 상태 선언하기
+> reactive()는 객체나 배열과 같은 레퍼런스타입. 즉 객체타입만 반응형 객체로 만들 수 있다. 
+```vue
+const state = reactive({
+  count: 0,
+  deep: {
+    count: 0,
+  },
+});
+
+<p>{{ message }}</p>
+let message = reactive('hello vue');
+<!-- 
+이렇게 선언해야 작동됨.
+-->
+<p>{{ message.value }}</p>
+
+let message = reactive({
+			value: 'hello vue',
+		});
+```  
+#### ref()로 원시값 반응형 데이터 생성하기
+> ref()는 기본타입(number, string, boolean)을 반응형으로 만들 수 있다.
+```vue
+import { ref } from 'vue'
+const count = ref()
+```
+
+#### 반응형 객체의 ref() unwrapping
+> ref()로 선언한 데이터를 반응형 객체의 속성으로 주입하게 되면, 자동으로 unwrapping된다.
+> 그럼에도 반응형은 연결되어 있다.
+
+```vue
+
+const count = ref(0);
+const state = reactive({
+  count,
+});
+console.log(count.value); // 1
+console.log(state.count); // 1 
+// state.count.value라고 적지 않아도 된다.
+
+```
+
+
+#### ref()가 반응형 배열 또는 Map과 같은 기본 컬렉션 타입의 요소로 접근될 때, wrapping 유지.
+```vue
+
+const message = ref('Hello');
+const arr = reactive([message]);
+console.log(arr[0].value);
+
+```
+
+#### 반응형 상태 구조 분해하기
+>  큰 반응형 객체의 몇몇  속성을 사용할 때, ES6 구조분해할당을 이용한다.   
+>  반응형 객체에서 구조분해 할당을 하게 되면 반응형 속성을 잃는다.   
+> 아래 예시에서 검사창을 확인하면 반응형 속성이 동작하지 않는다.  
+> typeof 검사를 해보면 string으로 나온다.
+```vue
+<template>
+	<div>
+		<p>author : {{ author }}</p>
+		<p>title : {{ title }}</p>
+	</div>
+</template>
+
+<script>
+import { reactive } from 'vue';
+export default {
+	setup() {
+		const book = reactive({
+			author: '주으니',
+			year: '2020',
+			title: 'Vue 3 Guide',
+			description: '당신은 지금..',
+			price: '18,000원',
+		});
+
+		const { author, title } = book;
+
+		return {
+			author,
+			title,
+			book,
+		};
+	},
+};
+</script>
+
+```
+
+##### 반응성을 잃지 않으면서 구조분해할당을 하려면?
+###### ```toRefs()```
+> 구조분해할당 여러개 할 때 사용.   
+> 원래 있던 객체의 속성과, 구조분해해서 재할당한 반응형 상태는 서로 동기화된다.   
+
+```vue
+
+		const { author, title } = toRefs(book);
+
+```
+
+
+###### ```toRef()```
+> 구조분해할당 한 개씩만 가져올 때 사용.   
+> 두 번째 파라미터로 가져오고 싶은 속성을 넣으면 된다.   
+```vue
+
+		const author = toRef(book, 'author');
+		const title = toRef(book, 'title');
+
+```
+
+
+#### ```readonly```
+반응형 객체의 변경을 방지한다.
+
+```vue
+const copy = readonly(original);
+
+```
+
+### ```computed```
+계산된 결과를 보여준다. 템플릿에 적으면 코드가 복잡하니 setup()안에 computed() 정의하여 코드를 깔끔하게 한다.
+반응형 데이터(ref,reactive)의 종속 관계를 자동으로 세팅할 때.
+> '캐시된다.' 계산된 결과를 보관하고 있다가 다음에 또 요청될때 캐시된 데이터를 돌려준다. (일반 메서드는 실행될 때마다 몇 번이고 계산된다.)   
+> 반응형 데이터가 변경될 때, 캐시가 다시 계산된다.   
+> 기본적으로 getter(읽기)전용이다. 새 값을 할당하려 하면 오류 표시된다.     
+> > 쓰기가 필요하다면 getter(보내고), setter(받고) 함수를 적용시킨다.   
+```vue
+<script>
+import { reactive, computed, ref } from 'vue';
+export default {
+	setup() {
+		const teacher = reactive({
+			name: '진주은',
+			lectures: ['HTML/CSS', 'Javascript', 'Vue3'],
+		});
+
+		const hasLectures = computed(() => {
+			console.log('computed');
+			return teacher.lectures.length > 0 ? '있음' : '없음';
+		});
+
+		const existLectures = () => {
+			console.log('method');
+			return teacher.lectures.length > 0 ? '있음' : '없음';
+		};
+
+		const count = ref(0);
+
+		const firstName = ref('홍');
+		const lastName = ref('길동');
+		const fullName = computed({
+			get() {
+				// 원래 값 보내기
+				return firstName.value + ' ' + lastName.value;
 			},
-		{
-			path: 'one',
-			name: 'NestedOne',
-			component: NestedOneView,
-		},
-		{
-			path: 'two',
-			name: 'NestedTwo',
-			component: NestedTwoView,
-		},
-	],
-},
-```
-
-### router.replace
-= router.push
-
-> 현재 페이지 컴포넌트를 '대체'한다.   
-> 히스토리에 쌓이지 않는다.   
->	> 예를 들면, 페이지 이동을 about -> nested -> nested/one 페이지로 이동했다고 하자.   
->	> nested에 딸린 페이지 one, two는 link를 router.replace로 처리하였다.   
->	> 이 때, one과 two 페이지는 nested 페이지를 대체한다.   
->	> 그래서 one(또는 two, three four..) 페이지에서 뒤로 가기를 누르면 about 페이지가 나온다.   
-```html
-// replace 사용 안함
-<router-link to="/nested/one">Nested One</router-link>
-
-//replace 사용
-<router-link :to="{ name: 'NestedOne', replace: true }">Nested One</router-link>
-```
-
-# 페이지 컴포넌트에 Props 전달
-
-0. api 데이터 내보내기
-```js
-export function getPostById(id) {
-	const numberID = parseInt(id); // string -> number 변환
-	return posts.find(item => item.id === id);
-}
-```
-
-1. 데이터를 가져올 컴포넌트
-```js
-import { getPostById } from '@/api/posts';
-..
-const id = route.params.id;
-const form = ref({});
-
-const fetchPost = () => {
-	const data = getPostById(id);
-	form.value = { ...data };
-};
-```
-
-
-
-### reactive()와 ref() 의 차이
-일관성 유지를 위해 보통 ref()를 쓴다.
-
-#### ref()
-장점
-- reference(참조타입. array.function. object. date .. ), Primitive(원시타입. Number, String, Boolean, Null, undefined) 모두 할당 가능.
-- 한꺼번에 객체 할당 가능 + 반응형 살아있음
-- form.value = {...data}
-- 일관성 유지
-
-단점
-- .value를 계속 붙여야 한다.
-- form.value.title, form.value.content
-
-#### reactive()
-장점
-- value를 안 붙여도 된다.
-- form.title, form.content
-
-단점
-- 레퍼런스 타입만 할당이 가능.
-- 객체할당을 하면 반응성을 잃는다.
-- form.title = data.title;
-- form.content = data.content;
-
-### 게시판 상세 미리보기 만들기!
-목록들이 간략하게 카드 형태로 나열되어 있고,
-
-하단 섹션에는 게시판 상세 내용 미리보기 영역이 있다.
-
-파라미터 값은 라우트 객체에 의존되어 있다.
-
-라우트에서 ```props:true```를 넣어주면
-
-파라미터(id값)가 해당 페이지 컴포넌트에 props로 전달된다.
-
-**index.js**
-```js
-{
-	path: '/posts/:id', // 동적 url. 유저마다 다른 여러개의 url을 하나의 페이지에 매핑.
-	name: 'PostDetail',
-	component: PostDetailView,
-	props: true,
-},
-```
-
-해당 페이지 컴포넌트에서 ```defineProps``` 정의
-
-**PostDetailView.vue**
-```js
-
-// 라우트에서 props로 넘겨줬기 때문에 props로 받기.
-const props = defineProps({
-	id: String,
-});
-..
-//하단에 id로만 정의되어있는 부분 props.id로 수정
-const fetchPost = () => {
-	const data = getPostById(props.id);
-	form.value = { ...data };
-};
-..
-const goEditPage = () =>
-	router.push({ name: 'PostEdit', params: { id: props.id } });
-
-```
-
-
-
-### id값을 여기저기 보낼 경우, ```index.js```
-보낼 id가 있는 컴포넌트의 라우터에서 ```props:true```
-
-#### 객체 모드로 넘길수도 있음.   
-```props:{word: 'hello'}```
-
-#### 함수 모드로 넘기기.   
-props에서 속성도 넘길 수 있다.   
-*parseInt() - 문자열을 정수로 바꾸는 함수   
-```js
-props: (route) => {
-	return {
-		id : parseInt(route.params.id),
-		other: route.query..
-	}
-}
-
-// other은 삭제하고 단축해서 적으면..
-props: route => ({ id: parseInt(route.params.id) }),
-```
-
-
-#### 보여 줄 id를 정한다
-PostListView.vue
-```
-<PostDetailView :id="1"></PostDetailView>
-```
-
-
-
-# 다양한 History 모드
-
-## 우선 알아야 할 것
-### SPA 
-빌드 파일 생성 '/dist'
-```bash
-npm run build
-```
-생성되면 파일이 하나다. 구조도 코드도 단촐하다. 난 분명 페이지를 많이 만들었는데!!! 왜일까?   
-뷰,리액트,앵귤러는 SPA 기반의 프레임워크이기 때문이다. 즉, 빌드된 결과물은 하나의 페이지에서 작동한다. 리로딩하지 않고 빠르게 UI를 보여준다.
-
-### 서버 사이드 렌더링
-ui에서 보여질 html문서를 서버에서 만들어 내려주는 것
-
-### 클라이언트 사이드 렌더링
-프웍처럼 js코드로 html를 생성해 사용자에게 보여줌.
-
-### Hash 모드와 History 모드
-Hash모드, History 모드의 차이는 운영서버에 배포할 때 일어난다.
-
-index.js
-```js
-const router = createRouter({
-	history: createWebHistory('/'), // ('/base')로 설정하면, url root에 기본으로 붙는다. /base/about, /base/home..
-	history: createWebHashHistory(),// #이 붙는다.
-	routes,
-});
-```
-
-#### Hash 모드
-createWebHashHistory()
-> 운영서버 배포할 때 ```index.html``` 이 파일만 배포.   
-> 요청은 뒤에 url 제거 (해쉬)   
-> 루트로만 요청하면 index.html 파일 돌려줌.   
-> 어차피 서버에 요청을 루트로 보내니, 서버 설정 없이 배포할수있다.   
-> 웹사이트 크롤링 X. SEO X. 크롤링 봇이 해시를 무시할때가 많다.(치명적 단점)   
- 
-
-#### History 모드
-CreateWebHistory()
-> 전체 경로 포함해서 요청한다.   
-> 이 경로는 404 뜸.   
-> 그래서 서버 설정을 추가로 해야 한다. 공식문서 가이드 있음.   
-> 대부분 이걸 사용해서 배포.   
-
-
-
-# API 서버 통신
-
-### github json-server library
-명령어 하나로 api서버 생성 가능.
-```bash
-npm i -D json-server
-npx json-server --watch db.json //api 서버 실행, db.json 생성
-db.json 파일에 posts data 넣기
-npx json-server --watch db.json --port 5000
-package.json에 명령어 등록
-..
-npm run db // 이 명령어 띄우고 localhost 띄워야 데이터 보임!
-```
-
-### github axios
-서버와 통신하기 위한 비동기 통신 모듈.
-```bash
-npm i axios
-```
-
-posts.js
-```js
-export function getPosts() {
-	return axios.get('http://localhost:5000/posts');
-}
-// 단건 조회
-export function getPostById(id) {
-	return axios.get(`http://localhost:5000/posts/${id}`);
-}
-// 등록
-export function createPost(data) {
-	return axios.post('http://localhost:5000/posts', data);
-}
-// 수정
-export function updatePost(id, data) {
-	return axios.put(`http://localhost:5000/posts/${id}`, data);
-}
-// 삭제
-export function deletePost(id) {
-	return axios.delete(`http://localhost:5000/posts/${id}`);
-}
-```
-
-### promise
-자바스크립트에서 비동기를 처리할 때 사용하는 객체.
-값을 받을땐
-```js
-const fetchPosts = () => {
-	getPosts()
-		.then(response => {
-			console.log('response: ', response);
-		})
-		.catch(error => {
-			console.log('error: ', error);
+			set(value) {
+				//쓰기 가능한 속성으로 만듬
+				[firstName.value, lastName.value] = value.split(' ');
+			},
 		});
+		console.log('Console 출력:', fullName.value);
+		fullName.value = '짐 코딩';
+		return {
+			teacher,
+			hasLectures,
+			existLectures,
+			count,
+			fullName,
+		};
+	},
 };
+</script>
+
 ```
 
-### promise 객체 대신 async awit (promise의 문법적 설탕)
-```js
-const fetchPosts = async () => {
-	try {
-		const { data } = await getPosts();
-		posts.value = data;
-	} catch (error) {
-		console.error(error);
-	}
-};
+
+# HTML 클래스 바인딩✨
+### ```v-bind / :```
+> 일반 클래스와 바인드된 클래스는 공존할수 있다.   
+> 여러 class를 넣으려면 콤마(,)로 구분한다.   
+```vue
+
+<div :class="{ active: isActive, 'text-danger': hasError }">text</div>
+
+```
+> 바인딩할 데이터가 많다면 오브젝트로 사용 가능하다.   
+```vue
+<div :class="classObject">text</div>
+
+const classObject = reactive({
+  active: true,
+  'text-danger': false,
+ });
 ```
 
-오류를 받을 때 catch()
+> 배열로도 넣을 수 있다.   
+```vue
 
-객체를 로그로 출력할 땐 console.dir()을 사용하면 편하다.
-ex) ```console.dir(response)```
+<div :class="[activeClass, errorClass]">text</div>
 
-
-### 게시글 등록 구현
-1. 폼 객체 생성
-PostCreateView.vue
-```js
-const form = ref({
-	title: null,
-	content: null,
-});
-```
-2. v-model 바인딩 및 save 메서드 넣기
-PostCreateView.vue
-```html
-<form @submit.prevent="save">
-..
-<input
-	v-model="form.title"
-	type="text"
-	class="form-control"
-	id="title"
-/>
-..
-<textarea
-	v-model="form.content"
-	class="form-control"
-	id="contents"
-	rows="3"
-></textarea>
 ```
 
-3. save 메서드 등록
-PostCreateView.vue
-```js
-import { createPost } from '@/api/posts';
+### inline Style 
+```vue
+<div :style="styleObject">
+
 ...
-const save = () => {
-	try {
-		createPost({
-			...form.value,
-			createdAt: Date.now(),
+
+const styleObject = reactive({
+  color: 'red',
+  fontSize: '13px',
+});
+
+```
+> 속성명을 camelCase로 넣는다.   
+
+
+### 동적으로 style 바인딩하기
+```vue
+
+<template>
+	<div>
+		<div :style="styleObject">
+			Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos nam
+			voluptatibus, aut unde odit accusantium consequatur voluptatum earum ullam
+			a est dolores perspiciatis quaerat libero odio exercitationem sapiente
+			voluptate. Vero!
+		</div>
+		<button @click="fontSize--">-</button>
+		<button @click="fontSize++">+</button>
+	</div>
+</template>
+
+<script>
+import { computed, reactive, ref } from 'vue';
+export default {
+	setup() {
+		// const styleObject = reactive({
+		// 	color: 'red',
+		// 	fontSize: '13px',
+		// });
+
+		const fontSize = ref(13);
+
+		const styleObject = computed(() => {
+			return {
+				color: 'red',
+				fontSize: fontSize.value + 'px',
+			};
 		});
-		router.push({ name: 'PostList' });
-	} catch (error) {
-		console.error(error);
-	}
+		return { styleObject, fontSize };
+	},
 };
+</script>
+
 ```
 
-db.js 파일에도 data가 추가된다.
+# 조건부 렌더링✨
 
-### 글 상세 페이지 구현
-postDetailView.vue
-```js
-<h2>{{ post.title }}</h2>
-<p>{{ post.content }}</p>
-<p>{{ post.createdAt }}</p>
-const post = ref({
-	title: null,
-	content: null,
-	createdAt: null,
-});
-..
-const fetchPost = async () => {
-	try {
-		const { data } = await getPostById(props.id);
-		setPost(data);
-	} catch (error) {
-		console.error(error);
-	}
+### ```v-if```
+> js 문법과 흡사하다. 참: 보임 / 거짓: 안보임      
+> false일 때 렌더링조차 안 된다.   
+> ```v-for```와 동시 사용 피하기.
+
+### ```v-else```
+> if, else
+
+### ```v-else-if```
+> if, else if, else
+
+### ```<template v-if="">``` 여러 개의 HTML요소를 v-if 디렉티브로 연결하기
+> 하나의 조건으로 여러 노드 컨트롤
+
+### ```v-show```
+> 노드는 그대로 있고, style의 display 여부로 표시 여부를 결정한다.
+
+### ```v-if``` vs ```v-show```
+
+#### ```v-if```   
+> 실제로 렌더링된다. 전환 비용이 높다.   
+> 초기 렌더링 시, false이면 아무 작업도 하지 않는다.   
+> 자주 전환하는 노드일 때 사용하기.   
+
+#### ```v-show```  
+> 일단 엘리먼트를 생성한다. 초기 비용이 높다.   
+> 조건에 따라 display block/none으로 속성을 전환한다.   
+> 런타임 시 조건이 변경되지 않을 때 사용하기.
+
+#### 예제
+```vue
+
+<template>
+	<div>
+		<h2 v-if="visible">Hello Vue3</h2>
+		<h2 v-else>this is false.</h2>
+		<button @click="visible = !visible">toggle</button>
+
+		<hr />
+
+		<button @click="type = 'A'">A</button>
+		<button @click="type = 'B'">B</button>
+		<button @click="type = 'C'">C</button>
+		<button @click="type = 'D'">D</button>
+
+		<h2 v-if="type === 'A'">A입니다.</h2>
+		<h2 v-else-if="type === 'B'">B입니다.</h2>
+		<h2 v-else-if="type === 'C'">C입니다.</h2>
+		<h2 v-else>A, B, C가 아닙니다.</h2>
+
+		<hr />
+		<template v-if="visible">
+			<h1>title</h1>
+			<p>hi, hello</p>
+			<p>hi, hello</p>
+		</template>
+		<hr />
+
+		<h1 v-show="on">title 입니다.</h1>
+		<button @click="on = !on">Show title</button>
+	</div>
+</template>
+
+<script>
+import { ref } from 'vue';
+export default {
+	setup() {
+		const visible = ref(false);
+		const type = ref('A');
+		const on = ref(true);
+		return { visible, type, on };
+	},
 };
-const setPost = ({ title, content, createdAt }) => {
-	post.value.title = title;
-	post.value.content = content;
-	post.value.createdAt = createdAt;
-};
-fetchPost();
+</script>
+
+<style scoped></style>
+
+
 ```
 
-### 글 수정 구현
-PostEditView.vue
-```js
-<form @submit.prevent="edit">
-..
-<input
-		v-model="form.title"
-		type="text"
-		class="form-control"
-		id="title"
-	/>
-<textarea
-	v-model="form.content"
-	class="form-control"
-	id="contents"
-	rows="3"
-></textarea>
-...
+# 목록 렌더링✨
 
-import { getPostById, updatePost } from '@/api/posts';
-..
-const form = ref({
-	title: null,
-	content: null,
-});
-const fetchPost = async () => {
-	try {
-		const { data } = await getPostById(id);
-		setForm(data);
-	} catch (error) {
-		console.error(error);
-	}
-};
-..
-const setForm = ({ title, content }) => {
-	form.value.title = title;
-	form.value.content = content;
-};
-...
-const edit = async () => {
-	try {
-		await updatePost(id, { ...form.value });
-		router.push({ name: 'PostDetail', params: { id } });
-	} catch (error) {
-		console.error(error);
-	}
-};
-```
-
-
-### 글 삭제 구현
-PostDetailView.vue
-```js
-<button class="btn btn-outline-danger" @click="remove">삭제</button>
-..
-import { getPostById, deletePost } from '@/api/posts';
-...
-const remove = async () => {
-	try {
-		if (confirm('삭제하시겠습니까?') === false) {
-			return;
-		}
-		await deletePost(props.id);
-		router.push({ name: 'PostList' });
-	} catch (error) {
-		console.error(error);
-	}
-};
-```
-
-
-# Pagination & Filter 구현 
-github.com/typicode/json-server 참고
-### _sort
-정렬의 기준이 되는 key
-### order
-asc: 오름차순   
-desc: 내림차순
-
-PostListView.vue
+### ```v-for```
+> 배열인 목록을 렌더링할 수 있다.
+> ```v-for="item in items"``` 배열에서 항목을 순차적으로 할당한다.
+> ```v-for="(item, index) in items" :key="item.id"```
+> > 배열 인덱스 가져오기
+> > ```:key``` 속성에 고유한 값 지정해야 함.
+### 예제
 ```vue
 <template>
 	<div>
-		<h2>게시글 목록</h2>
-		<hr class="my-4" />
-		<form @submit.prevent><!-- 제출 기능(기본기능) 막기 -->
-			<div class="row g-3">
-				<div class="col">
-					<input v-model="params.title_like" type="text" class="form-control" /><!-- 검색 기능. v-model에 title_like 값을 양방향 바인딩. -->
-				</div>
-				<div class="col-3">
-					<select v-model="params._limit" class="form-select"><!-- 필터 기능. v-model에 limit 값을 바인딩. -->
-						<option value="3">3개씩 보기</option>
-						<option value="6">6개씩 보기</option>
-						<option value="9">9개씩 보기</option>
-					...
-		<nav class="mt-5" aria-label="Page navigation example">
-			<ul class="pagination justify-content-center">
-				<li class="page-item" :class="{ disabled: !(params._page > 1) }">
-					<a
-						class="page-link"
-						href="#"
-						aria-label="Previous"
-						@click.prevent="--params._page"
-					>
-						<span aria-hidden="true">&laquo;</span>
-					</a>
-				</li>
-				<li
-					v-for="page in pageCount"
-					key="page"
-					class="page-item"
-					:class="{ active: params._page === page }"
-				>
-					<a class="page-link" href="#" @click.prevent="params._page = page">{{
-						page
-					}}</a>
-				</li>
-				<li
-					class="page-item"
-					:class="{ disabled: !(params._page < pageCount) }"
-				>
-					<a
-						class="page-link"
-						href="#"
-						aria-label="Next"
-						@click.prevent="++params._page"
-					>
-						<span aria-hidden="true">&raquo;</span>
-					</a>
-				</li>
-			</ul>
-		</nav>
-		<hr class="my-5" />
-		<AppCard>
-			<PostDetailView :id="1"></PostDetailView>
-		</AppCard>
+		<ul>
+			<template v-for="(item, index) in evenItems" :key="item.id">
+				<!-- <li v-if="item.id % 2 === 0"> -->
+				<li>ID : {{ item.id }}, 인덱스: {{ index }}, {{ item.message }}</li>
+			</template>
+		</ul>
+
+		<hr />
+
+		<ul>
+			<li v-for="(value, key, index) in myObject" :key="key">
+				{{ index }}-{{ key }}-{{ value }}
+			</li>
+		</ul>
 	</div>
 </template>
-<script setup>
-const params = ref({
-	_sort: 'createdAt',  // 기준
-	_order: 'desc', // 내림차순 정렬
-	_limit: 3, //몇 개씩 조회할 것인지?
-	_page: 1, // 어느 페이지를 보여줄 것인지?
-	title_like: '', // 검색. 일단 빈값을 넣고 값을 받을 input에 v-model로 연결한다.
-});
-//paganation
-const totalCount = ref(0);
-const pageCount = computed(() =>
-	Math.ceil(totalCount.value / params.value._limit),
-); // 올림한다. (토탈카운트의 값 나누기 조회할 페이지를)
+<script>
+import { computed, reactive } from 'vue';
+export default {
+	setup() {
+		const items = reactive([
+			{ id: 1, message: 'Java' },
+			{ id: 2, message: 'HTML' },
+			{ id: 3, message: 'css' },
+			{ id: 4, message: 'JavaScript' },
+		]);
 
-const fetchPosts = async () => {
-	try {
-		const { data, headers } = await getPosts(params.value);
-		posts.value = data;
-		totalCount.value = headers['x-total-count']; // header 값으로 x-total-cout를 받아와 변수에 넣는다.
-	} catch (error) {
-		console.error(error);
-	}
+		const evenItems = computed(() => items.filter(item => item.id % 2 === 0));
+
+		const myObject = reactive({
+			title: '제목',
+			author: '홍길동',
+			pub: '2022-03-22',
+		});
+		return { items, evenItems, myObject };
+	},
 };
-watchEffect(fetchPosts); // v-model로 인해서 변경이 일어나면 다시 실행한다.(페이지 이동 후 리스트 재생성)
-..
 </script>
 ```
 
-# axios 모듈, Vite 환경 변수 설정
+# 디렉티브✨
 
-### axios 라이브러리를 모듈로 분리
+## 디렉티브 구성
+- v-on:submit.pervent="onSubmit"
+- 디렉티브:전달인자.수식어="값"
 
-api/index.js 생성
-```js
-import axios from 'axios'; //axios를 이 파일에서 임포트한다
+## v- 접두사가 있는 특수 속성
+### v-text
+### v-html
+### v-cloak
+> 컴포넌트가 준비되지 않았을 때, 라이브러리나 외부 자산이 로딩되지 않은 깨진 화면을 보여주기 싫을 때
+> 로딩중인 화면을 보여줄 때
+> style에 [v-cloak] 속성에 로딩에 관한 속성이나 display none이나.. 이런 속성을 넣어주면, 로딩중일 때 해당 속성을 보여준다.
 
-// create라는 함수에 baseURL, options 파라미터를 설정하고 
-// instance 변수를 담고 리턴한다.
-function create(baseURL, options) {
-	const instance = axios.create(Object.assign({ baseURL }, options));
-	return instance;
-} 
+### v-once
+>	엘리먼트, 컴포넌트를 한 번만 렌더링한다. 이후 재렌더링 시, 엘리먼트, 컴포넌트 및 모든 하위 엘리먼트는 정적 컨텐츠로 처리되고 건너뛴다. 업데이트 성능을 최적화한다. 
 
-// posts 변수에 create 변수를 담고, 파라미터 값으로 게시판 url을 설정해서 내보낸다.
-export const posts = create('http://localhost:5000/posts');
+### v-memo="[x, y, z]"
+>	데이터 변경에 대한 캐시를 쌓아놨다가 따로 적어놓은 배열 값 x,y,z이 업데이트 되었을때만 한꺼번에 데이터를 변경한다.
+
+
+# 이벤트 처리✨
+### ``` v-on(@) ```
+
+### 메소드 이벤트 핸들러 
+v-on 디렉티브에서 메소드를 호출할 수 있다. 이 때, 매개변수로 event 객체를 받는다.
 ```
-
-posts.js 수정
-```js
-// axios 임포트를 지우고 앞전에 만든 posts 변수를 받는다.
-import { posts } from '.';
-
-// 중복으로 들어갔던 http://localhost:5000.. url을 지운다.
-// axios 대신 posts를 넣는다.
-export function getPosts(params) {
-	return posts.get('/', { params });
+const eventInfo = (message) => {
+	console.log...
 }
-// 단건 조회
-export function getPostById(id) {
-	return posts.get(id + '');
-}
-// 등록
-export function createPost(data) {
-	return posts.post('', data);
-}
-// 수정
-export function updatePost(id, data) {
-	return posts.put(`/${id}`, data);
-}
-// 삭제
-export function deletePost(id) {
-	return posts.delete(id + '');
-}
-```
+<button @click="eventInfo"></button> 
 
-vite 공식 홈페이지 -env - 환경 변수   
-import.meta.env.MODE // 현재 구동되는 애플리케이션이 어떤 모드인지 (개발 or 운영)   
-vite.config.js 옵션에서 설정 가능. 디폴트는 dev모드.   
-
-import.meta.env.BASE_URL   
-import.meta.env.PROD // 현재 운영 모드인가? boolean 값   
-import.meta.env.DEV // 현재 개발 모드인가? boolean 값   
-
-
-개발/운영 모드에 따라 다른 url을 가져오려면   
-환경 변수를 설정해야 한다.   
-.env Files
-
-.env
-```
-VITE_APP_API_URL=http://localhost:5001
-```
-
-.env_development(우선순위가 더 높다. 그래서 default값이다.)
-```
-VITE_APP_API_URL=http://localhost:5000
-```
-
-접두사 VITE를 수정하고 싶다면
-vite.config.js의 defineConfig 설정에서
-envPrefix:'변경할 값'
-
-api/index.js url 수정
-```js
-...
-export const posts = create(`${import.meta.env.VITE_APP_API_URL}/posts`);
 ```
 
 
-# 공통 컴포넌트 분리
-한 번 더 듣기
 
-# 버그 수정 : HTTP PUT vs PATCH
+### 이벤트 객체(다이렉트로)접근
 
-# Transitions
-
-vue 내장 컴포넌트.
-나타나고 사라지는 animation 구현
-
-- v-if
-- v-show
-- <component>
-
-AppAlert.vue
 ```vue
-<template>
-	<Transition name="slide">
-		<div v-if="show" class="app-alert alert" role="alert" :class="typeStyle">
-			{{ message }}
-		</div>
-	</Transition>
-</template>
+const eventInfo = (message, sign) => {
+	console.log...
+}
+<button @click="eventInfo('hello world!', $sign)"></button> 
+```
 
+
+vue에서는 이벤트 이름 앞에 v-on 디렉티브를 사용함으로, 이벤트를 연결할 수 있다.
+키보드 이벤트의 예시를 보자.
+```vue
+
+<input type="text" @keyup="onKeyupHandler" />
+
+const onKeyupHandler = event => {
+		console.log('event.key: ', event.key);
+	};
+	
+```
+input에 키보드로 입력할 때마다 onKeyupHandler 이벤트가 연결되어 console창에 키보드로 입력하는 key들이 출력된다.
+
+
+### 이벤트 수식어
+>	e.preventDefault() , e.stopPropagation()는 비효율적이라 그 대신에 Vue는 ```v-on``` 이벤트에 다양한 수식어를 제공한다.   
+>	 여러 기능을 함께 사용 가능.  
+>  ```<a href="https://naver.com" @click.prevent.stop="clickA">A영역</a>```   
+- ```.stop``` = ```e.stopPropagation()``` 이벤트 버블링을 막는다.
+-	```.prevent``` = ```e.preventDefault()``` tag가 가지고 있는 기능을 막는다.
+-	```.capture``` 캡쳐 모드를 사용해 이벤트 리스너를 사용 가능하다. 먼저 이벤트를 실행할 때 사용한다.
+-	```.self``` 오로지 자기 자신만 호출한다. 타깃요소가 self(나 자신)일때 발동.
+- ```.once``` 한 번만 실행한다.
+- ```.passive``` 모바일 장치의 성능을 개선하기 위해 터치이벤트 리스너와 사용된다. 
+		```<div @scroll.passive="onScroll">..</div>```
+
+
+#### 키 수식어
+키보드 이벤트를 수신할 때 특정 키를 확인해야 하는 경우.
+- ```.enter```
+- ```.tag```
+- ```.delete```
+- ```.esc```
+- ```.space```
+- ```.up```
+- ```.down```
+- ```.left```
+- ```.right```
+
+#### 시스템 키 수식어
+해당 수식어 키가 눌러진 경우에만 mouse 또는 keyboard 이벤트 리스너를 트리거할 수 있다.
+- ```.ctrl```
+- ```.alt```
+- ```.shift```
+- ```.meta``` MAC:command / Window: Win
+
+
+# 양방향 바인딩✨
+FE에서 입력 양식을 처리할 때, value상태와 js의 반응형 상태를 동기화해야할 경우가 있다. js로 처리할 수 있지만, v-model 디렉티브로 간단히 처리할 수 있다.
+
+### ```v-model```
+#### js로 처리
+```html
+<input type="text" :value="inputValue" @input="event => (inputValue = event.target.value)" />
+```
+#### v-model 디렉티브로 처리
+```html
+<input type="text" v-model="inputValue" />
+```
+
+v-model은 내부적으로 html요소에 따라 서로 다른 속성과 이벤트를 사용한다.
+#### ```checkbox, radio, select```
+- @change
+- checkbox에서 true-value="값", false-value="값" 속성을 넣으면, true/false일 때 출력할 값을 정할 수 있다.
+
+#### v-model 수식어
+
+##### ```.lazy```
+default는 input 이벤트 후 입력과 데이터를 동기화한다. .lazy 수식어를 추가하여 change 이벤트 이후에 동기화할 수 있다. (변경하는 중엔 동기화가 안 되고, 포커스가 떨어졌을 때 동기화된다.)
+
+#### ```.number```
+자동으로 number 타입으로 형변환. 
+
+
+#### ```.trim```
+앞뒤 공백 제거.
+
+
+# Watch WatchEffect✨
+
+### Watch
+반응형 '상태가 변경될 때'마다 '특정 작업'을 수행한다.
+또다른 DOM을 조작하고, 또다른 API를 호출해서 상태를 변경할 때 그것을 추적한다.
+ 명시적이다.'어떠한 데이터를 감시하겠다'
+```vue
+const message = ref('hello Vue3')
+
+watch(message, (newValue, oldValue) => {
+	console.log('newValue: ', newValue);
+	console.log('oldValue: ', oldValue);
+});
+
+
+watch(감지할 반응형 데이터, (변경된 새로운 값, 이전 값) => {
+
+})
+
+```
+
+#### 감지할 데이터
+ref, reactive, computed, getter(), array..
+
+#### getter
+특정 오브젝트의 속성(ex:number)를 감지하려면 getter함수를 넣는다.
+getter함수로부터 받은 값이 변경되었을때만 감지한다.
+```vue
+watch(
+			() => obj.count,
+			(newValue, oldValue) => {
+				console.log('newValue: ', newValue);
+			},
+		);
+```
+
+#### deep option
+반응형 객체를 직접 watch()하면 깊은 감시자가 생성된다.
+모든 중첩된 속서에도 트리거된다.
+
+#### immediate 즉시 실행
+최초에 즉시 실행.
+watch함수의 매개변수로 넣는다.
+immediate: true,
+
+또는 변수 안에 함수로 담아서 watch함수의 두 번째 매개변수로 넣고,
+함수를 선언 및 return.한다.
+```vue
+import { ref, watch } from 'vue';
+
+export default {
+	setup() {
+		const message = ref('hello');
+		const reverseMessage = ref('');
+
+		const reverseFunction = () => {
+			reverseMessage.value = message.value.split('').reverse().join('');
+		};
+
+		watch(message, reverseFunction);
+		reverseFunction();
+		return { message, reverseMessage };
+	},
+};
+```
+
+### WatchEffect
+최초로 즉시 실행된다.
+콜백함수 안에서 사용한 반응형 api만 감시한다.
+```vue
+watchEffect(() => {
+			console.log('watchEffect');
+			save(title.value, contents.value);
+		});
+```
+
+### bootstrap 5 설치
+UI 프레임워크
+
+1. npm install bootstrap bootstrap-vue
+2. main.js에 import 'bootstrap/dist/css/bootstrap.min.css';
+3. main.js에 마운트 다음줄에 import 'bootstrap/dist/js/bootstrap.js';
+4. npm run dev
+5. getbootstrap.com에서 ui 가져오기
+
+* vuetify
+vue에 특화된 UI 프레임워크
+
+
+# 컴포넌트 기초✨
+
+### 전역 등록
+컴포넌트를 사용하지 않더라도 최종 빌드에 해당 컴포넌트가 포함되어 파일의 크기를 증가시킨다.
+컴포넌트간 종속 관계를 확인하기 힘들다.
+```app.component()```
+```vue
+import { createApp } from 'vue';
+import App from './App.vue';
+
+import GlobalComponent from './components/GlobalComponent.vue';
+
+const app = CreateApp(App)
+// 한 개일 경우
+app.component('GlobalComponent', GlobalComponent)
+
+//여러 개일 경우
+app
+	.component('ComponentA', ComponentA)
+	.component('ComponentB', ComponentB)
+	.component('ComponentC', ComponentC)
+
+app.mount('#app');
+
+```
+
+### 지역 등록
+부모 컴포넌트 안에서만 사용 가능하다.
+```vue
+import ChildComponent from './ChildComponent.vue'
+
+export default {
+	components:{
+		ChildComponent
+	},
+	setup(){
+		..
+	}
+}
+
+```
+
+
+### 파일 명
+- 케밥 케이스나 파스칼 케이스로 짓는다.
+- 베이스 컴포넌트 이름(button, icon, table..) 접두사로는 Base, App, V를 붙인다. VButton, VTable, VIcon..
+- 싱글 인스턴스 컴포넌트 이름은 (layout, header, sidenav..) 접두사로 The를 붙인다. TheNav, TheHeader, TheFooter..
+
+
+# SFC✨
+template + script + style 세 개의 블록을 갖고 있다.
+
+### <template>
+>	각 *.vue 파일은 오직 하나의 top-level <template></template> 블록을 포함한다.   
+>	콘텐츠는 추출되어 ```@vue/compiler-dom``` 으로 전달되고, JS 렌더 기능으로 사전 컴파일되고, render 옵션으로 내보내어 컴포넌트에 첨부된다.
+
+### <script>와 <script setup>
+> 이 둘은 따로국밥이다. 한 파일에 공존이 가능하다. 한 파일에 각각 한 개씩만 포함할 수 있다.   
+> script setup은 사전에 처리되어 컴포넌트의 setup()함수로 사용된다. 
+
+### <style>
+>	여러 개의 스타일 블럭이 포함될 수 있다.
+>	스타일 모듈화를 위해 scoped 또는 module 속성을 가질 수 있다.
+#### scoped
+현재 컴포넌트의 요소에만 적용된다.
+특수 속성이 선언되고, 그 속성을 갖고 있는 엘리먼트에게만 스타일이 적용된다.
+```css
 <style scoped>
-.slide-enter-from,
-.slide-leave-to {
-	opacity: 0;
-	transform: translateY(-30px);
-}
-.slide-enter-active,
-.slide-leave-active {
-	transition: all 0.5s ease;
-}
-.slide-enter-to,
-.slide-leave-from {
-	opacity: 1;
-	transform: translateY(0px);
+.red {
+	color: red !important;
 }
 </style>
 ```
-- v-enter-from 같은 class명은 transition 컴포넌트의 기능이다.(공식문서 참고) 나타나고 사라질 때 스타일속성을 부여할 수 있다.
-- Transition 컴포넌트의 name을 설정해주면 css에서 v 접두사 대신에 쓸 수 있다.
+
+#### module
+class에 바인딩하여 쓴다.
+```vue
+<template>
+	<p :class="$style.red">text</p>
+</template>
+
+<style module>
+.red {
+	color: red !important;
+}
+</style>
+```
+모듈 속성에 값을 지정하여 주입된 클래스 객체의 속성 키를 변경할 수 있다.
+```vue
+<template>
+	<p :class="classes.red">text</p>
+</template>
+
+<style module="classes">
+.red {
+	color: red !important;
+}
+</style>
+```
 
 
 
-# TransitionGroup
-v-for 목록에 삽입.
-제거 또는 이동할 때 애니메이션 적용
+
+### 사용자 정의 블록
+- vue-i18n : 다국어 지원 블록
+
+### 전처리기
+```lang``` 속성을 사용하여 전처리기 언어를 선언할 수 있다. script엔 보통 ts를 선언한다.
+```js
+<script lang="ts">
+	//use TS
+</script>
+```
+style태그에 scss를 선언할 수도 있다.
+```scss
+<style lang="scss">
+// use scss
+</style>
+```
+
+
+# Props✨
+## 부모---data--->자식 
+> 컴포넌트에 등록할 수 있는 사용자 정의 속성.   
+> 부모 컴포넌트에서 자식 컴포넌트에서 데이터를 전달하는 방법.   
+> 외부에서 데이터를 전달받을 수 있다.   
+
+##### 자식 컴포넌트 (AppCard.vue)
+1. script에 props 옵션 선언
+```js
+export default{
+	props: ['title', 'contents'],
+}
+```
+2.  템플릿 안에서 문자열 템플릿 삽입
 ```html
-<transition-group name="slide">
-	<div
-		v-for="({ message, type }, index) in items"
-		:key="index"
-		class="alert"
-		role="alert"
-		:class="typeStyle(type)"
-	>
-		{{ message }}
-	</div>
-</transition-group>
+<h5>{{ title }}</h5>
+<p>{{ contents }}</p>
 ```
 
-# 모달modal 팝업
-# Teleport 컴포넌트
-컴포넌트를 특정 돔으로 위치이동시키는 내장 컴포넌트. vue3에서 사용 가능
-선언 없이 사용 가능하다.
-teleport to="#위치이동시킬곳"
-예를 들면, 모달팝업 노드를 가장 바깥에 위치시킬 수 있다.
-
-**하위 컴포넌트**
+##### 부모 컴포넌트 (TheView.vue)
+3. [정적] 자식 컴포넌트 속성에 값 넣기.
 ```html
-<teleport to="#modal">
-	<PostModal
-		v-model="show"
-		:title="modalTitle"
-		:content="modalContent"
-		:createdAt="modalCreatedAt"
-	/>
-</teleport>
+<div><AppCard title="제목1" contents="내용1"></AppCard></div>
 ```
 
-**index.html**
+3. [동적] 자식 컴포넌트 속성에 v-bind로 값 넣기.
 ```html
-<body>
-	<div id="app"></div>
-	<div id="modal"></div>
-	<script type="module" src="/src/main.js"></script>
-</body>
-```
-
-
-
-# Plugins
-vue에 전역 수준의 기능을 추가할 때.
-> app.component() 전역 컴포넌트 등록   
-> app.directive() 커스텀 디렉티브 등록   
-> app.provide() 앱 전체에 리소스 주입   
-> app.config.globalProperties 전역 애플리케이션     인스턴스에 속성 또는 메서드 추가   
-
-오브젝트
-```js
-const objPlugins = {
-	install(app, options) {
-		console.log('objPlugins app:', app);
-		console.log('objPlugins options:', options);
-		//app.component() 전역 컴포넌트
-		//app.config.globalProperties 전역 애플리케이션 인스턴스에 속성 추가
-		//app.directive 커스텀 디렉티브
-		//app.provide() 리소스
-	},
-};
-export default objPlugins;
-```
-
-함수로 추가
-```js
-const objPlugins = {
-	install(app, options) {
-		console.log('objPlugins app:', app);
-		console.log('objPlugins options:', options);
-		//app.component() 전역 컴포넌트
-		//app.config.globalProperties 전역 애플리케이션 인스턴스에 속성 추가
-		//app.directive 커스텀 디렉티브
-		//app.provide() 리소스
-	},
-};
-export default objPlugins;
-```
-
-**main.js**
-```js
-..
-import funcPlugins from './plugins/func';
-import objPlugins from './plugins/obj';
-..
-app.use(funcPlugins);
-app.use(objPlugins, { name: '짐코딩' });
-..
-```
-
-# 글로벌 컴포넌트 등록
-
-unplugin-vue-components
-컴포넌트를 자동으로 import해줌
-자동으로 인터페이스 생성.
-```bash 
-npm i unplugin-vue-components -D
-```
-dirs: 자동으로 가져오 길 원하는 컴포넌트의 디렉토리
-dts: components.d.ts에 모든 컴포넌트에 대한 type 자동으로 설정해줌
-
-**vite.config.js**
-```js
-...
-import Components from 'unplugin-vue-components/vite';
-export default defineConfig({
-plugins: [
-	vue(), 
-	Components({ 
-		dts: true, // components.d.ts에 모든 컴포넌트에 대한 type 자동으로 설정해줌
-		dirs: ['src/components/app'] // 특정 컴포넌트만 해당 모듈에서 자동으로 import해오길 원한다면, 자동으로 등록할 컴포넌트의 디렉터리 설정
-})],
+<div><AppCard :title="post.title" :contents="post.contents"></AppCard></div>
 ...
 ```
-# 커스텀 디렉티브 등록
-v로 시작하는 카멜케이스 변수 - 객체로 정의 - mounted 훅을 이용해 매개변수로 el(엘리먼트)받는다.
-
-**PostForm.vue**
 ```js
-<input 
-	v-focus />
-
-...
-
-const vFocus = {
-	mounted: el => {
-		el.focus();
-	},
-};
+setup(){
+	const post = reactive({
+		title: "제목1",
+		contents: "내용1"
+	})
+	return { post }
+}
 ```
---> 페이지에 들어가자마자 input에 포커스됨 동적인 ui에도 잘 동작한다.
-그렇다고 html속성의 autofocus와는 다르다. 동적인 ui가 들어가면 동작하지 않는다. 페이지가 로딩된 시점에서 한 번만 동작된다.
 
-### 일반 script에서 선언하는 방법
-directives 옵션을 사용한다.
-v를 제외하고 이름을 입력한다.
+3. [배열] v-for 사용. 가장 효율적인 방법.
+
+```html
+<div v-for="post in posts" key="post.id"><AppCard :title="post.title" :contents="post.contents"></AppCard></div>
+...
+```
 ```js
-<script>
-	export default{
-		setup(){
+setup(){
+	const posts = reactive([
+		{id: 1, title: "제목1", contents: "내용1"},
+	...
+		{id: 5, title: "제목5", contents: "내용5"},
+	])
+	return { posts }
+}
+```
 
+4. [조건] 연산자를 이용해 조건에 따라 출력.
+- 자식 컴포넌트에서 조건 설정
+```html
+<span class="badge bg-secondary">{{ type === 'news' ? '뉴스' : '공지사항'}}</span>
+// type이 'news'이면 '뉴스'를 출력하고, 그게 아니라면 '공지사항'을 출력한다.
+```
+- 부모 컴포넌트에서 배열의 값 설정
+```js
+const posts = reactive([
+			{ id: 1, title: '제목1', contents: '내용1', isLike: false, type: 'news' },
+			{
+				id: 2,
+				title: '제목2',
+				contents: '내용2',
+				isLike: true,
+				type: 'notice',
+			},
+....
+```
+
+- 부모 컴포넌트의 템플릿에서 v-bind 데이터 바인딩.
+```html
+<AppCard
+		:title="post.title"
+		:contents="post.contents"
+		:type="post.type"
+		:isLike="post.isLike"
+	></AppCard>
+```
+
+
+#### Props 선언
+> 문자열 배열 선언과 객체타입 선언이 있는데, 객체타입으로 가능한 상세하게 정의해야 한다.   
+> 컴포넌트에 ```props``` 옵션을 사용하여 선언한다.   
+> 객체 타입으로 선언할 때의 속성(파스칼 표기법으로, 맨 앞은 꼭 영어 대문자.)   
+>	> type : String, Number, Boolean, Array, Object, Date, Function, Symbol 모든 기본 생성자 또는 모든 사용자 정의 타입이 올 수 있다.(Person Animal)   
+>	> default : 속성값이 비어있거나 undefined를 전달 받는경우 기본값을 선언할 수 있다.    
+>	>	> 객체나 배열과 같은 레퍼런스 타입의 default를 설정할 경우에는 기본값을 반환하는 팩토리함수를 설정해야 한다.   
+>	> required : 속성이 필수값이라면 true로 설정.     
+>	> validator : 유효성 검사가 필요할 때 사용한다.   
+
+```js
+props: {
+	type: {
+		type: String,
+		default: 'news',
+		validator: value => {
+			return ['news', 'notice'].includes(value); //값에  news와 notice만 포함한다. 그 외에는 console에 경고문 뜬다.
 		},
-		directive:{
-			focus:{
-			}
-		}
+	},
+	title: {
+		type: String,
+		required: true,
+	},
+	contents: {
+		type: String,
+		required: true,
+	},
+	isLike: {
+		type: Boolean,
+		default: false,
+	},
+	// 객체나 배열과 같은 레퍼런스 타입의 default를 설정할 경우에는 기본값을 반환하는 팩토리함수를 설정해야 한다.
+	obj: {
+		type: Object,
+		default: () => ({})
 	}
+},
+```
+
+#### Props 사용
+> 선언된 props를 template에서 바로 사용할 수 있다.  ```<p>{{ title }}</p>```   
+> setup()함수의 첫 번째 매개변수로 props 객체를 받아 사용할 수 있다.
+
+##### v-if를 props의 class 데이터 바인딩(computed, v-bind)을 사용하여 클린하게 변경하기 
+
+원래 코드
+```html
+<span class="badge bg-secondary">{{ type === 'news' ? '뉴스' : '공지사항'}}</span>
+<a v-if="isLike" href="#" class="btn btn-danger">좋아요</a>
+<a v-else href="#" class="btn btn-outline-danger">좋아요</a>
+```
+
+수정된 코드
+```html
+<span class="badge bg-secondary">{{ typeName }}</span>
+<a href="#" class="btn" :class="isLikeClass">좋아요</a>
+```
+
+```js
+setup(props) {
+		const isLikeClass = computed(() =>
+			props.isLike ? 'btn-danger' : 'btn-outline-danger',
+		);
+		const typeName = computed(() =>
+			props.type === 'news' ? '뉴스' : '공지사항',
+		);
+		return { isLikeClass, typeName };
+	},
+```
+
+##### 객체를 사용하여 다중 속성 전달
+v-bind로 사용해서 전달할 수 있다.(위에서 서술)
+
+##### 단방향 데이터 흐름
+> 모든 props는 상위속성과 하위 속성간에 단방향 바인딩으로 형성되어있다.   
+> 상위 속성이 업데이트되면 하위 속성이 업데이트되지만, 하위에서 상위로의 업데이트는 안된다.   
+> 자식 컴포넌트에서 상위 컴포넌트로 이벤트를 전달하려면 emit을 사용한다.  
+
+##### 객체 / 배열 Props 업데이트
+이러한 레퍼런스 타입을 속성으로 전달할 때 주의할 점이 있다.
+
+#### Boolean Casting
+
+# emit✨
+## 자식---event--->부모
+자식 컴포넌트에서 부모 컴포넌트로 데이터 전달 또는 트리거
+```emit``` 메서드로 구현 가능하다.
+
+부모 컴포넌트
+```html
+<PostCreate @create-post="createPost"></PostCreate>
+```
+```js
+const createPost = (a, b, c, d) => {
+	console.log('createPost', a, b, c, d);
+};
+```
+
+```자식 컴포넌트```는 세 가지 방법으로 구현할 수 있다.
+
+1. 컴포넌트 내장 메서드로 구현하는 방법
+> 이벤트를 부모에게 올릴 때, 변수 뿐만 아니라 파라미터도 넘길 수 있다.   
+
+```html
+<button class="btn btn-primary" @click="$emit('createPost', 1, 2, 3, '냥냥')">button</button>
+```
+
+
+2. setup()의 두 번째 파라미터인 context 객체의 emit 메서드로 구현하는 방법
+> 자식에게 파라미터 값이 있으면 이벤트와 함께 받을 수 있다.
+```html
+<button class="btn btn-primary" @click="createPost">button</button>
+```
+```js
+export default {
+	setup(props, context) {
+		const createPost = () => {
+			context.emit('createPost', 1, 2, 3, '냥냥');
+		};
+		return { createPost };
+	},
+};
+```
+
+3. 구조분해할당 
+> 객체로 emit 메서드를 가져온다.
+> 마크업은 위와 동일.      
+```js
+export default {
+	setup(props, { emit }) {
+		const createPost = () => {
+			emit('createPost', 1, 2, 3, '냥냥');
+		};
+		return { createPost };
+	},
+};
+```
+
+## emits 이벤트 선언 (vue3)
+이벤트를 선언하지 않아도 동작하지만, 잘 문서화하기 위해서 이벤트를 선언해야 한다.
+
+1. 문자열 배열 선언
+```js
+export default {
+emits: ['createPost'],
+..
+```
+2. 객체문법 선언
+> validation 로직 추가 가능. 필요없으면 null 선언
+> 이벤트명 선언(createPost)
+> 우리가 넘기는 파라미터(newTitle)가 이벤트명의 매개변수가 된다.
+> 유효성 체크에 걸려도 이벤트가 발생은 되지만 console에 경고가 뜬다.
+```js
+export default {
+
+	emits: {
+		createPost: newTitle => {
+			console.log('validator: ', newTitle);
+			if (!newTitle) { //값이 없다면
+				return false; // 경고창 뜸
+			}
+			return true;
+		},
+	},
+
+	setup(props, { emit }) {
+		const title = ref('');
+		const createPost = () => {
+			emit('createPost', title.value);
+		};
+		return { createPost, title };
+	},
+};
+```
+
+유효성 체크가 없는 경우
+```js
+emits: {
+	createPost: null,
+},
+```
+### v-model
+vue3
+
+
+#### 기본값
+modelvalue라는 props로 값을 입력받아 (vue2: value)
+update:modelValue로 이벤트를 발생시킬 수 있다.(vue2: @input)
+```js
+props:['modelValue'],
+emits:['update:modelValue']
+```
+
+```전달인자```를 사용하면 이름을 수정할 수 있다.
+modelvalue -> title로 이름 변경.
+
+부모 컴포넌트
+```html
+<LabelTitle v-model:title="mainTitle"></LabelTitle>
+```
+
+자식 컴포넌트
+```html
+<input
+	type="text"
+	:value="title"
+	@input="$emit('update:title', $event.target.value)",
+/>
+```
+```js
+import { computed } from 'vue';
+export default {
+	props: ['title'],
+	emits: ['update:title'],
+...
+
+```
+
+### computed
+get, set 으로 읽고 쓰기
+
+부모 컴포넌트
+```html
+<LabelTitle v-model:title="username" label="제~목"></LabelTitle>
+```
+
+자식 컴포넌트
+```html
+<input v-model="value" type="text" />
+```
+```js
+import { computed } from 'vue';
+export default {
+	props: ['title', 'label'],
+	emits: ['update:title'],
+	setup(props, { emit }) {
+		const value = computed({
+			get() {
+				return props.title;
+			},
+			set(value) {
+				emit('update:title', value);
+			},
+		});
+		return { value };
+	},
+};
+```
+
+
+# Non-Prop 속성✨
+= fallthrough 속성
+props와 emit에 명시적으로 선언하지 않는 속성, 또는 이벤트.
+이 속성은 루트 요소의 속성에 자동으로 추가된다.
+
+부모 컴포넌트
+```html
+<LabelInput
+	v-model="username"
+	label="이~름"
+	class="non-class"
+	style="color: red"
+	id="아이디"
+	data-id="data"
+	hello="kkk"
+></LabelInput>
+```
+자식 컴포넌트
+```html
+<template>
+	<label>
+		{{ label }}
+		<input v-model="value" type="text" />
+	</label>
+</template>
+```
+
+최종 렌더링된 DOM
+```html
+<label 
+	class="non-class" 
+	id="아이디" 
+	data-id="data" 
+	hello="kkk" 
+	style="color: red;"
+>이~름
+	<input type="text" />
+</label>
+```
+
+### class, style
+이 두 속성은 조금 다르게 상속한다. 병합된다.
+
+만약 자식 컴포넌트 루트요소에 이미 속성이 정의되어 있다면,
+class와 style는 병합된다.
+id는 부모로부터 받은 것만 덮어씌워진다.
+부모 컴포넌트
+```html
+<LabelInput
+	v-model="username"
+	label="이~름"
+	class="parent-class"
+	style="color: red"
+	id="parent-id"
+></LabelInput>
+```
+자식 컴포넌트
+```html
+<template>
+	<label 
+		class="child-class" 
+		style="border: 1px solid #000" 
+		id="child-id">
+		{{ label }}
+		<input v-model="value" type="text" />
+	</label>
+</template>
+```
+
+최종 렌더링된 DOM
+```html
+<label 
+	class="child-class parent-class" 
+	id="parent-id" 
+	style="color: red; border: 1px solid rgb(0, 0, 0);"
+>이~름
+	<input type="text" />
+</label>
+```
+
+### v-on 이벤트 리스너 상속
+부모 컴포넌트에서 선언된 자식 컴포넌트 템플릿에 v-on 이벤트를 걸면 잘 작동된다.
+이는, non-props 속성은 자식컴포넌트의 루트 엘리먼트에 상속되기 때문이다.
+
+### 속성 상속 비활성화
+inheritAttrs: false
+컴포넌트 내에서 depth가 추가되면 루트 엘리먼트가 변할수도 있다.
+비활성화할 컴포넌트 내에서 선언하면 된다.
+
+#### non-props 속성 핸들링 하는 방법
+> 속성 상속을 비활성화했을 때, 자식 컴포넌트 내부에 이벤트를 걸고 싶으면 ```$attrs``` 객체를 사용하여 v-bind바인딩하면 된다.   
+> 중간에 하이픈이 들어간 속성은 대괄호로 감싸준다. ```$attrs['foo-bar']```   
+>```@click```과 같은 ```v-on``` 리스너는 ```$attrs.onClick```로 접근한다.
+
+
+자식 컴포넌트
+```html
+<button class="btn btn-primary" type="button" v-bind="$attrs"></button>
+```
+속성에 접근하려면
+```js
+export default {
+	inheritAttrs: false, // 속성 상속 비활성화상태
+	setup(props, context) {
+		console.log('context.attrs:', context.attrs);
+		console.log('class:', context.attrs.class);
+		console.log('id:', context.attrs.id);
+		console.log('onClick:', context.attrs.onClick);
+		return {};
+	},
+};
+```
+
+### Fragments (vue3)
+다중 루트 노드 컴포넌트
+> template 태그 바로 아래에 여러 개의 자식을 넣을 수 있다.   
+> 자유롭게 마크업해도 가능하다.   
+> 그래서, 만약 컴포넌트가 다중 루트일 때, non-props를 쓸때 어디에 상속할지! 명시적으로! v-bind="$attrs"로 지정해야 한다.   
+> 또는 자식 컴포넌트에서 이벤트를 발생시켜 emit으로 올릴 때는, emits:[""] 옵션을 꼭 선언해야 한다.   
+
+-
+부모 컴포넌트
+```html
+<LabelInput label="이름" data-id="이름"></LabelInput>
+```
+
+자식 컴포넌트
+```html
+<template>
+	<label class="form-label" id="child-id">
+		{{ label }}
+	</label>
+	<input v-model="value" v-bind="$attrs" type="text" class="form-control" />
+</template>
+```
+  data-id="이름"은 input에 상속된다.
+
+
+# Slots✨
+컴포넌트에 컨텐츠를 전달하는 방법.
+
+자식 컴포넌트 FancyButton.vue
+```vue
+<template>
+	<button class="fancy-btn">
+		<slot></slot>
+	</button>
+</template>
+```
+
+부모 컴포넌트
+```vue
+<FancyButton>
+ // 콘텐츠 삽입하면 자식 컴포넌트의 slot에 그대로 전달됨.
+</FancyButton>
+```
+
+### fallback Content
+부모 컴포넌트에서 슬롯 콘텐츠가 제공되지 않을 때, slot에 대한 fallback(기본 콘텐츠)을 지정할 수 있습니다.
+
+자식 컴포넌트 FancyButton.vue
+```vue
+<template>
+	<button class="fancy-btn">
+		<slot>Default</slot>
+	</button>
+</template>
+```
+
+### Named Slots
+slot 요소에 name 속성을 부여하여 여러 개의 slot을 정의할 수 있다.
+특정 슬롯 콘텐츠가 렌더링 되어야 할 위치를 설정할 수 있다.
+name이 없는 slot의 name은 default이다.
+
+자식 컴포넌트 FancyButton.vue
+```vue
+<template>
+	<div class="card">
+		<div class="card-header">
+			<slot name="header">#header</slot>
+		</div>
+		<div class="card-body">
+			<slot>#body</slot>
+		</div>
+		<div class="card-footer text-muted">
+			<slot name="footer">#footer</slot>
+		</div>
+	</div>
+</template>
+```
+
+부모 컴포넌트 
+```html
+<AppCard>
+	<template #header>제목</template>
+	이 부분은 암시적으로 default 슬롯으로 출력
+	<template #footer>푸터..</template>
+</AppCard>
+```
+> ```v-slot``` / 단축속성: ```#```   
+> 그냥 생으로 적으면 암시적으로 default 슬롯으로 출력됨.  
+
+### 동적으로 변경도 가능하다.
+
+부모 컴포넌트
+```html
+<template #[slotArgs]>제목</template>
+...
+const slotArgs = ref('header');
+```
+이렇게 넣으면 동적으로 변경도 가능하다.
+값을 default로 넣으면 body 부분에 바인딩되고,
+footer로 넣으면 footer 부분에 바인딩된다.
+
+### Render Scope
+Named Slots이 된다고 해서 부모 컴포넌트에서 자식 컴포넌트의 데이터에 접근할 수는 없다.
+
+슬롯 콘텐츠는 상위 컴포넌트에서 컴파일이 된다.
+그렇기 때문에 상위 컴포넌트의 데이터는 참조가 가능하다.
+
+해결하는 방법은 바로바로~~~
+
+### Scoped Slots
+자식 컴포넌트의 데이터를 상위 컴포넌트 안에서 사용하는 방법!
+props를 전달하는 것처럼! 하면 됨
+
+자식 컴포넌트
+> 디폴트 슬롯이다.   
+> 데이터를 출력할 slot에 값을 바인딩해준다.
+```html
+<slot :child-message="childMessage">#Body</slot>
+
+// 값이 더 있을 경우 
+<slot :child-message="childMessage" hello-message="안녕!">#Body</slot>
+
+...
+const childMessage = ref('자식 메시지')
+```
+
+
+부모 컴포넌트
+```html
+// 방법 1. 오브제로 받기
+<AppCard>
+	<template #default="obj">
+		{{ obj }}
+	</template>
+</AppCard>
+
+// 방법 2. 객체로 받기
+<AppCard>
+	<template #default="slotProps">
+		{{ slotProps.childMessage }}
+	</template>
+</AppCard>
+
+// 방법 3. 객체를 구조분해할당으로 받기.
+<AppCard>
+	<template #default="{childMessage}">
+	<!-- 값이 더 있을 경우-->
+	<template #default="{childMessage, helloMessage}">
+		{{ childMessage }}
+	</template>
+</AppCard>
+```
+
+#### 데이터 받기
+> default로 받을 때는 #default, v-slot="{}", 또는 #="{}"으로 받을 수 있다.
+> named로 받을 때는 #named="{}"
+자식 컴포넌트
+```html
+<slot :fancy-message="fancyMessage"></slot>
+<slot name="header" :fancy-message="fancyMessage"></slot>
+```
+
+부모 컴포넌트
+```html
+// default
+<FancyButton v-slot="{fancyMessage}"></FancyButton>
+
+//단축 속성 - default
+<FancyButton #="{fancyMessage}"></FancyButton>
+//단축 속성 - named
+<FancyButton #header="{fancyMessage}"></FancyButton>
+
+///template을 껴서 받을 경우
+<FancyButton>
+	<template #="{ fancyMessage }">{{ fancyMessage }}</template>
+	<template #header="{ fancyMessage }">{{ fancyMessage }}</template>
+</FancyButton>
+
+
+```
+
+### 예시
+AppCard.vue에서는 헤더, 바디, 푸터가 정의되어 있다.
+그러나 바디 부분만 쓰고 싶다.
+
+AppCard.vue에서 헤더와 푸터의 contents가 없음에도 불구하고 박스는 그대로 ui에 출력된다.
+이 공백 박스를 없애기 위해서는 ```슬롯 내장 객체```를 사용할 수 있다.
+
+그럴 땐 AppCard.vue에서 조건에 따라 렌더링할 박스에 ```v-if="$slots.footer"``` 를 넣어주면 된다.
+
+또는```computed```로 구현할 수도 있다.
+
+AppCard.vue
+```html
+<div v-if="hasFooter" class="card-footer text-muted">
+	<slot name="footer" footer-message="자식푸터메시지"></slot>
+</div>
+
+...
+setup(props, { slots }) {   
+	const hasFooter = computed(() => slots.footer);
+	return { hasFooter };
+},
+
+```
+
+# Provide / Inject✨
+부모 -> 자식 Props로 데이터 전달.
+만약 , 전달하는 데이터의 depth가 깊다면?
+Prop Drilling의 문제를 해결하는게 Provide/ Inject.
+계층 구조의 깊이에 상관없이, 모든 자식 컴포넌트에게 데이터를 전달할 수 있다.
+
+# Provide() ✨
+부모(provide 함수 사용) ------> 자식(손자일수도, 증손자일수도..)
+
+부모 컴포넌트
+```js
+setup(){
+	provide(주입 키, 주입할 값)
+},
+	...
+```
+> 첫 번째 파라미터 : 주입 키 : 문자열, symbol   
+> 두 번째 파라미터 : 주입할 값 : ref를 포함한 모든 유형   
+
+> 반응형 데이터도 넣을 수 있다. (리턴해야함)
+```html
+<template>
+	<div class="container py-4">
+		<div class="card">
+			<div class="card-header">ProvideInject Component</div>
+			<div class="card-body">
+				<button @click="count++">click</button>
+				<Child></Child>
+			</div>
+		</div>
+	</div>
+</template>
+```
+```js
+setup() {
+	const staticMessage = 'static message';
+	const message = ref('');
+	const count = ref(10);
+	//provide('static-message', staticMessage);
+	provide('message', message);
+	provide('count', count);
+	return { 
+		count 
+	};
+},
+```
+
+# Inject()  ✨
+데이터를 받을 (종속된)컴포넌트에서 inject 선언한다.
+```html
+<template>
+	<div class="card">
+		<div class="card-header">Deep Child Component</div>
+		<div class="card-body">
+			<p>{{ staticMessage }}</p>
+			<p>{{ message }}</p>
+			<p>{{ count }}</p>
+		</div>
+	</div>
+</template>
+```
+```js
+setup() {
+	const staticMessage = inject('static-message', 'default message');
+	const message = inject('message');
+	const count = inject('count');
+	return { 
+		staticMessage, 
+		message, 
+		count 
+	};
+},
+```
+
+### Reactivity
+Provide/Inject 반응성 데이터로 제공할 때,
+모든 변경을 Provider 내부에서 한다. 유지관리 용이하다.
+
+### readonly()
+연결된 하위 컴포넌트에서 제공된 값을 변경할 수 없다.
+
+### Symbol 키 사용
+대규모 프로젝트에서 충돌을 피하기 위해 Symbol 주입 키 사용
+
+### App 레벨 데이터 제공
+모든 컴포넌트에서 사용 가능
+
+main.js
+```js
+...
+app.provide('app-message', 'app message 입니다');
+app.config.globalProperties.msg = 'hello'; // vue2에서는 이렇게 사용.
+```
+
+component.vue
+```html
+<p>{{ appMessage }}</p>
+...
+import {inject } from 'vue';
+const appMessage = inject('app-message');
+
+// vue2에서 불러올 때.
+mounted() {
+		console.log(this.msg);
+	},
+```
+globalProperties는 vue2에서 사용했다.
+데이터를 불러올 때, mounted()는 컴포넌트 인스턴스가 생성된 후라서 this로 접근 가능하다.
+그러나 vue3 composition API setup()에서는 컴포넌트 인스턴스 생성 전이라 this 접근이 불가능하다.
+
+그래서 vue3에서는 app.provide()를 사용한다.
+setup함수 안에서 inject()로 주입 가능하다.
+
+
+
+# Lifecycle Hooks ✨
+각 단계에서 프로그래밍 코드를 수행할 수 있는 함수들을 말한다.
+Creation(생성) - Mounting(장착) - Updating(변경) - Destruction(소멸)
+
+Options API, ComPosition API 둘다 지원
+
+### Creation
+> 컴포넌트 초기화 단계.   
+> 가장 먼저 실행된다.   
+> 아직 컴포넌트가  DOM에 추가되기 전이라, DOM에 접근할 수 없다.   
+#### beforeCreate
+컴포넌트가 초기화될 때 실행되는 훅.
+컴포넌트 인스턴스에 접근 가능하다.this
+data()가 처리되기 전이라 data()에는 접근할 수 없다.
+
+#### created
+data() 처리 이후라, data() 접근 가능하다.
+
+#### setup
+beforeCreate, created는 vue3에서는 setup()에서 사용함.
+
+
+### Mounting
+DOM에 컴포넌트를 삽입하는 단계다.
+
+#### onBeforeMount
+컴포넌트가 마운트되기 직전에 호출됨.
+
+#### onMounted
+컴포넌트가 마운트된 후에 호출됨.
+DOM에 접근할 수 있다.
+모든 자식의 컴포넌트가 마운트되었다는 뜻.
+```
+<input ref="inputRef" type="text" value="hello" />
+...
+
+onMounted(() => {
+	console.log('onMounted', inputRef.value.value);
+});
+
+// hello 출력
+
+```
+
+#### 부모 자식 간의 lifecycle
+```bash
+setup
+onBeforeMount
+[Child] setup
+[Child] onBeforeMount
+[Child] onMounted
+onMounted 
+```
+
+### Updating
+컴포넌트에서 사용하는 반응형 데이터가 변경되거나, 재렌더링이 발생될 때 호출된다.
+
+#### onBeforeUpdate
+반응형 상태 변경으로 인해 컴포넌트가 DOM 트리를 업데이트하기 직전에 호출된다.
+
+#### onUpdated
+DOM트리를 업데이트 한 후에 호출된다.
+
+```bash
+onBeforeUpdate Hello World1
+DOM content:   // DOM이 업데이트 되기 전이라 빈값임
+onUpdated Hello World1
+DOM content:  Hello World1
+```
+
+### Destruction
+소멸 단계.
+
+#### onBeforeUnmount
+컴포넌트가 마운트 해제되기 직전에 호출된다.
+DOM을 가져올 수 있다.
+
+#### onUnmounted
+컴포넌트가 마운트 해제된 후 호출된다.
+
+
+# Template refs ✨
+템플릿 참조
+
+### 마운트된 Dom 요소 , 자식 컴포넌트에 대한 참조를 얻을 수 있다.
+
+> input은 마운트가 완료될 때까지 null이다. 마운트가 완료된 후에 참조값이 할당된다. 그래서 v-if 사용함.   
+> 
+```vue
+<template>
+	<div class="container py-4">
+		<input ref="input" type="text" />
+		<!-- ref에 이름을 정해준다! -->
+
+		<p>{{ input }}</p>
+		<!-- "[object HTMLInputElement]" 출력-->
+
+		<p v-if="input">
+			{{ input.value }}, {{ $refs.input.value }}, {{ $refs.input === input }}
+			<!--hello, hello, true 출력-->
+		</p>
+
+	</div>
+</template>
+<script>
+import { ref, onMounted } from 'vue';
+setup() {
+	const input = ref(null); // 위에 선언한 ref 값과 동일한 함수명 선언
+	console.log('setup: ', input.value); // null
+
+	onMounted(() => {
+		input.value.value = 'hello';
+		console.log('onMounted: ', input.value.value); 
+		// <input type="text">
+	});
+
+	return { input };
+	},
+};
 </script>
 ```
 
-### 전역적으로 사용하는 방법
-**main.js**
-```js
-import focus from '@/directives/focus';
-..
-app.directive('focus', focus);
+### ```v-for``` 내부 참조
+vue v3.2.25 이상에서 작동합니다.
+
+v-for 선언한 태그에 ref 속성으로 참조하면 된다.
 ```
-### Directive Hooks
-디렉티브 정의 객체는 다음과 같은 여러 훅을 사용할 수 있습니다. (모든 훅은 필수가 아닌 선택사항)
-```js
-const myDirective = {
-	// 바인딩된 요소의 속성 전에 호출됨
-	// 또는 이벤트 리스너가 적용됨
-	created(el, binding, vnode, prevVnode) {
-	// 인수에 대한 자세한 내용은 아래를 참조하십시오.
-	},
-	// 요소가 DOM에 삽입되기 직전에 호출됩니다.
-	beforeMount() {},
-	// 바인딩된 요소의 부모 구성 요소가 있을 때 호출됩니다.
-	// 모든 자식이 마운트됩니다.
-	mounted() {},
-	// 상위 컴포넌트가 업데이트되기 전에 호출됨
-	beforeUpdate() {},
-	// 상위 컴포넌트 다음에 호출되고
-	// 모든 자식이 업데이트되었습니다.
-	updated() {},
-	// 상위 컴포넌트가 마운트 해제되기 전에 호출됨
-	beforeUnmount() {},
-	// 상위 컴포넌트가 마운트 해제될 때 호출됩니다.
-	unmounted() {}
-	}
-}
-```
-### Directives Hooks의 매개변수
+<ul>
+	<li v-for="fruit in fruits" :key="fruit" ref="ltemRefs">{{ fruit }}</li>
+</ul>
 
-디렉티브 훅에는 다음과 같은 매개변수가 전달됩니다.
-
-- `el`: 디렉티브가 바인딩된 요소입니다. DOM을 직접 조작하는 데 사용할 수 있습니다.
-- `binding`: 다음 속성을 포함하는 개체입니다.
-    - `value`: 지시문에 전달된 값입니다. 예를 들어 `v-my-directive="1 + 1"`에서 값은 `2`입니다.
-    - `oldValue`: `beforeUpdate` 및 업데이트에서만 사용할 수 있는 이전 값입니다. 값이 변경되었는지 여부에 관계없이 사용 가능합니다.
-    - `arg`: 지시문에 전달된 인수(있는 경우). 예를 들어 `v-my-directive:foo`에서 인수는 `foo`입니다.
-    - `modifiers`: 수정자가 있는 경우 수정자를 포함하는 개체입니다. 예를 들어 `v-my-directive.foo.bar`에서 수정자 객체는 `{ foo: true, bar: true }`입니다.
-    - `instance`: 지시문이 사용되는 구성 요소의 인스턴스입니다.
-    - `dir`: 지시문 정의 개체.
-- `vnode`: 바인딩된 요소를 나타내는 기본 VNode.
-- `prevNode`: 이전 렌더링에서 바인딩된 요소를 나타내는 VNode. `beforeUpdate` 및 `updated` 후크에서만 사용할 수 있습니다.
-예를 들어 다음 디렉티브가 있다고 가정해 보겠습니다.
-
-```jsx
-<div v-example:foo.bar="baz">
 ```
 
-`binding` 매개변수는 다음과 같은 형태의 객체입니다.
-
-### 함수로 단축 표현
-**color.js 생성**
-```js
-function color(el, binding) {
-	el.style.color = binding.value;
-}
-
-export default color;
+###  컴포넌트 Refs
+> 자식 컴포넌트의 모든 속성과 메서드에 대한 전체를 접근할 수 있다.   
+> but, 부모/자식 컴포넌트간 의존도가 생기기 때문에 반드시 필요한 경우에만 사용한다.   
+> 일반적으로 props를 사용한다.
+부모 컴포넌트
+```
+<TemplateRefsChild ref="child"></TemplateRefsChild>
+...
+onMounted(() => {
+	console.log('child.message', child.value.message);
+	child.value.sayHello();
+});
+const child = ref(null);
 ```
 
-**global-directives.js**
-```js
-import color from '@/directives/color';
-export default {
-	install(app) {
-		app.directive('color', color);
+### ```$parent``` 객체
+자식 ->부모 접근
+자식 컴포넌트
+```
+<template>
+	<div>
+		{{ $parent }}
+		<ul>
+			<li v-for="fruit in $parent.fruits" :key="fruit">{{ fruit }}</li>
+		</ul>
+	</div>
+</template>
+```
+
+
+# script setup ✨
+```<script setup>``` 을 쓰면
+```
+export default{
+	setup(){
+		return{};
 	},
 };
 ```
+를 생략할 수 있게 된다.
+컴포넌트 정의도, 리턴도, 필요없다.
 
-**PostForm.vue**
-```html
-<input
-	v-color="'blue'"
-/>
+## setup()에서 접근할수있는 객체를 setup() 없이 어떻게 사용하냐?
+
+### script setup 안에서 props와 emits 사용
+
+```defineProps```
+```defineEmits```
+
+script setup 안에서 쓰는 컴파일러 매크로. 임폴트x
+
+### defineExpose()
+> script setup을 사용하는 컴포넌트는 기본적으로 Template Refs나 $parent와 같이 컴포넌트간 통신이 닫혀있다.   
+> 내부 데이터, 메서드 명시적 노출 defineExpose()
+
+자식에서 노출할 데이터를 정의.
+
+### useSlots, useAttrs
+
+```
+import { useSlots, useAttrs } from 'vue'
+const slots = useSlots()
+const attrs = useAttrs()
 ```
 
-### 객체 리터럴
-여러 값이 필요한 경우, 객체를 전달할 수 있다.
-```html
-<div v-demo="{ color:'white', text:'hello' }"></div>
-```
+### 한 번만 실행되어야 하는 로직이 있을 때, script와 script setup을 함께 사용한다. 
+(plugin 등등)
+> 동일한 컴포넌트를 여러 번 사용할 경우, 각각의 컴포넌트 인스턴스가 생성(A)된다. script setup은 A의 갯수만큼 생성된다.   
+> 이런 상황에서 script를 한 번만 실행할 때 사용한다.   
 ```js
-app.directive('demo', (el, binding) =>{
-	console.log(binding.value.color) // "white"
-	console.log(binding.value.text) // "white"
-}) 
-```
-
-### 컴포넌트에서 커스텀 디렉티브 사용
-> 커스텀 디렉티브가 컴포넌트에서 사용되면 Non-Props 속성과 유사하게 루트 노드에 적용됨.
-> 다중 루트 컴포넌트면 x
-> v-bind="$attrs" 전달 x
-> 권장하지 않는 작업방식이다.
-
-### dayjs 플러그인
-
-dayjs('0000-00-00').format('')
-```bash 
-npm i dayjs
-```
-**dayjs.js 생성**
-```js
-import dayjs from 'dayjs';
+<script>
 export default {
-	install(app) {
-		app.config.globalProperties.$dayjs = dayjs;
-		app.provide('dayjs', dayjs); //provide로 데이터 내보냄
-	},
+	inheritAttrs: false,
 };
-```
-**main.js에 선언**
-```js
-import dayjs from './plugins/dayjs';
-...
-app.use(dayjs);
-```
-
-**사용**
-
-- 단순하게 템플릿 안에서 쓸 경우
-```html
-<p>{{ $dayjs(post.createdAt).format('YYYY. MM. DD. HH:mm:ss') }}</p>
+</script>
+<script setup>
+import { ref } from 'vue';
+const message = ref('message');
+</script>
 ```
 
-- 스크립트 내에서 함수를 써야하는 경우
-inject로 받고, props로 데이터를 받는다.   
-```js
-<p>{{ createdDate }}</p>
-...
-const dayjs = inject('dayjs');
-const createdDate = computed(() =>
-	dayjs(props.createdAt).format('YYYY. MM. DD HH:mm:ss'),
-);
+### Top-level ```await```
+top level에서 await 사용 가능.
+async setup()
+우선, json data를 위해서 통신모듈을 설치한다.
+npm i axios
+
+dummy sample API
+	https://dummy.restapiexample.com/api/v1/employees
+
+eslinttrc.cjs에 추가(경고표시 해제)
+env: {
+		'vue/setup-compiler-macros': true,
+	},
+
+# 동적 컴포넌트 ✨
+탭을 눌렀을 때 아래 콘텐츠가 바뀌게 하는 것처럼, 컴포넌트를 동적으로 변경하고 싶을 때
+```v-bind:is```
 ```
+<component :is="동적으로 넣을 컴포넌트명"></component>
+```
+```ref```함수로 정의하느것보다 ```shallowRef``` 함수로 정의하는게 퍼포먼스적으로 유리하다.
+> 속성에 대해선 반응하지 않고, 값이 바꼈을때만 반응한다. ex) name의 값이 바뀌었을때 말고  object -> string으로 바뀌었을때만 반응한다.
+```
+<template>
+	<div class="container py-4">
+		<button
+			class="btn btn-primary me-2"
+			@click="changeCurrentComp(DynamicApple)"
+		>
+			사과
+		</button>
+		<button class="btn btn-danger" @click="changeCurrentComp(DynamicBanana)">
+			바나나
+		</button>
+		<hr />
+		<component :is="currentComp"></component>
+		<p>{{ obj1 }}</p>
+		<p>{{ obj2 }}</p>
+	</div>
+</template>
 
-# Composable
-composition API를 활용하여 상태 저장 로직을 캡슐화,재사용
+<script setup>
+import { ref, shallowRef } from 'vue';
+import DynamicApple from './DynamicApple.vue';
+import DynamicBanana from './DynamicBanana.vue';
 
-함수가 루트컴포넌트, 자식컴포넌트에 동시에 생성되면 동작이 안되는 경우가 있다. 그래서 중앙에서 관리하는 상태 관리 시스템이 필요하다.
-
-# axios 컴포저블 함수 구현
-데이터를 성공적으로 조회했을 때 - 목록 ui 출력
-실패 - error 출력
-딜레이 - Loading 출력
+const currentComp = shallowRef(DynamicApple);
+const obj1 = ref({ name: '주으니' });
+const obj2 = shallowRef({ name: '냐하' });
+const changeCurrentComp = comp => (currentComp.value = comp);
+</script>
+```

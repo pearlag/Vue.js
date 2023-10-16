@@ -33,7 +33,7 @@
 			type="checkbox"
 			id="chk01"
 			:checked="checkboxValue"
-			@change="event => (checkboxValue = event.target.checked)"
+			="event => (checkboxValue = event.target.checked)"
 		/>
 		-->
 		<label for="chk01">{{ checkboxValue }}</label>
